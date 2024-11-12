@@ -3,26 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\UnauthorizedException;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Resources\User\UserResource;
 use App\Mail\ResetPasswordKodMail;
 use App\Mail\ResetPasswordLinkMail;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 class AuthController extends CoreController
 {

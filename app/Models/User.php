@@ -20,11 +20,16 @@ class User extends Authenticatable
 
     protected $fillable = [
         'role_id',
+        'category_id',
         'first_name',
         'last_name',
         'email',
         'phone',
         'password',
+        'phones',
+        'color',
+        'bd_date',
+        'comment'
     ];
 
     protected $hidden = [
@@ -36,4 +41,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public static function setUserBd($params)
+    {
+        if ($params['bd_day']){
+            return date('Y-m-d', strtotime( $params['bd_day']));
+        } else {
+            return null;
+        }
+    }
 }
