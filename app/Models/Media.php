@@ -9,6 +9,11 @@ class Media extends Model
 {
     use HasFactory;
 
+    /**
+     * Type id
+     */
+    const USER_MEDIA = 1;
+
     protected $table = 'media';
     protected $fillable = [
         'type_id',

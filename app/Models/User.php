@@ -42,6 +42,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'parent_id', 'id')
+            ->where('type_id', Media::USER_MEDIA);
+    }
+
     public static function setUserBd($params)
     {
         if ($params['bd_day']){
