@@ -23,7 +23,7 @@ class ClientController extends CoreController
         Route::group(
             [
                 'prefix' => 'client',
-                'middleware' => 'auth:sanctum'
+                'middleware' => 'auth:api'
             ],
             function () {
                 Route::get('get-clients', [static::class, 'getClients']);

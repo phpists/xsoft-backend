@@ -18,3 +18,5 @@ class MediasResource extends JsonResource
         });
     }
 }
+
+

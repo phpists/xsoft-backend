@@ -37,7 +37,7 @@ class AuthController extends CoreController
 //
                 Route::group(
                     [
-                        'middleware' => 'auth:sanctum'
+                        'middleware' => 'auth:api'
                     ],
                     function () {
                         Route::get('user', [static::class, 'getUser']);
@@ -69,7 +69,7 @@ class AuthController extends CoreController
             $user->password = Hash::make($input['password']);
             $user->saveOrFail();
 
-            $token = $user->createToken('access_token')->plainTextToken;
+            $token = $user->createToken('access_token')->accessToken;
 
             return $this->responseSuccess([
                 'user' => new UserResource($user),
@@ -100,7 +100,7 @@ class AuthController extends CoreController
         };
 
         $user = Auth::getProvider()->retrieveByCredentials($credentials);
-        $token = $user->createToken('access_token')->plainTextToken;
+        $token = $user->createToken('access_token')->accessToken;;
 
         return $this->responseSuccess([
             'user' => new UserResource($user),
