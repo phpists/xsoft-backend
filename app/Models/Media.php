@@ -13,6 +13,7 @@ class Media extends Model
      * Type id
      */
     const USER_MEDIA = 1;
+    const PRODUCT_MEDIA = 2;
 
     protected $table = 'media';
     protected $fillable = [
