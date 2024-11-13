@@ -31,6 +31,7 @@ class ProductController extends CoreController
             function () {
                 Route::get('get-products', [static::class, 'getProducts']);
                 Route::post('add-product', [static::class, 'addProduct']);
+                Route::post('update-product', [static::class, 'updateProduct']);
 
                 Route::get('get-product-info', [static::class, 'getProductInfo']);
             }
@@ -90,6 +91,56 @@ class ProductController extends CoreController
 
         return $this->responseSuccess([
             'message' => 'Товар успішно збережений',
+            'product' => new ProductResource($product)
+        ]);
+    }
+
+    public function updateProduct(Request $request)
+    {
+        $data = $request->all();
+
+        $product = Product::where('id', $data['id'])->first();
+        $product->update([
+            'user_id' => auth()->id(),
+            'brand_id' => $data['brand_id'],
+            'category_id' => $data['category_id'],
+            'article' => $data['article'],
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'product_measure_id' => $data['product_measure_id'],
+            'color' => $data['color'],
+            'balance' => $data['balance'],
+            'materials_used_quantity' => $data['materials_used_quantity'],
+            'materials_used_measure_id' => $data['materials_used_measure_id'],
+        ]);
+
+        if (isset($data['items'])) {
+            foreach ($data['items'] as $item) {
+                ProductItem::updateOrCreate([
+                    'id' => $item['id'],
+                ], [
+                    'product_id' => $data['id'],
+                    'tax_id' => $item['tax_id'],
+                    'cost_price' => $item['cost_price'],
+                    'retail_price' => $item['retail_price'],
+                ]);
+            }
+        }
+
+        if ($product) {
+            if ($request->hasFile('media')) {
+                foreach ($data['media'] as $media) {
+                    Media::create([
+                        'type_id' => Media::PRODUCT_MEDIA,
+                        'parent_id' => $product->id,
+                        'file' => FileService::saveFile('uploads', "products", $media),
+                    ]);
+                }
+            }
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Товар успішно відредагований',
             'product' => new ProductResource($product)
         ]);
     }

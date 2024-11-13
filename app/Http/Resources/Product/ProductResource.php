@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\Product;
 
+use App\Http\Resources\Media\MediasResource;
 use App\Http\Resources\ProductItem\ProductItemsResource;
+use App\Http\Resources\Traits\HasFullInfoFlag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,6 +26,7 @@ class ProductResource extends JsonResource
             'materials_used_measure_id' => $this->materials_used_measure_id,
             'created_at' => date('Y-d-m H:i:s', strtotime($this->created_at)),
             'items' => new ProductItemsResource($this->productItem),
+            'media' => new MediasResource($this->media)
         ];
 
         return $return;

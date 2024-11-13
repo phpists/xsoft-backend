@@ -28,6 +28,12 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class, 'product_id', 'id');
     }
+
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'parent_id', 'id')
+            ->where('type_id', Media::PRODUCT_MEDIA);
+    }
 }
 
 
