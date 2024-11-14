@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\User\DeleteUserRequest;
 use App\Http\Requests\User\SaveClientMediaRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Resources\User\UserResource;
@@ -11,6 +12,7 @@ use App\Models\Media;
 use App\Models\User;
 use App\Models\UserCategory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +30,7 @@ class ClientController extends CoreController
                 Route::post('add-client', [static::class, 'addClient']);
                 Route::post('edit-client', [static::class, 'editClient']);
                 Route::get('get-client', [static::class, 'getClient']);
+                Route::delete('delete-client', [static::class, 'deleteClient']);
 
 
                 Route::get('get-users-categories', [static::class, 'getUsersCategories']);
@@ -40,6 +43,15 @@ class ClientController extends CoreController
     {
         $data = $request->all();
         $builder = User::query();
+
+        if (isset($data['q'])) {
+            $query = $data['q'];
+            $builder->where('first_name', 'like', "%$query%")
+                ->orWhere('last_name', 'like', "%$query%")
+                ->orWhere('last_name', 'phone', "%$query%")
+                ->orWhere('email', 'like', "%$query%");
+        }
+
         $this->setSorting($builder, [
             'id' => 'id',
         ]);
@@ -128,7 +140,17 @@ class ClientController extends CoreController
         ]);
     }
 
-    public function getUsersCategories(Request $request)
+    public function deleteClient(Request $request)
+    {
+        $data = $request->all();
+        User::whereIn('id', $data['idx'])->delete();
+
+        return $this->responseSuccess([
+            'message' => 'Клієнти успішно видалені',
+        ]);
+    }
+
+    public function getUsersCategories(DeleteUserRequest $request)
     {
         return $this->responseSuccess([
             'categories' => UserCategory::all()

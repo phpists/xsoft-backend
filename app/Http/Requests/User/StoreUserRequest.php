@@ -17,13 +17,13 @@ class StoreUserRequest extends FormRequest
             'category_id' => 'required|integer|exists:users_categories,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'required|string|regex:/^380\d{9}$/',
-            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'phone' => 'required|string',
+            'color' => 'required|string',
             'bd_day' => 'required|date|before:today',
             'email' => 'required|string|email|unique:users,email',
             'comment' => 'nullable|string',
             'phones' => 'required',
-            'phones.*' => 'string|regex:/^380\d{9}$/',
+            'phones.*' => 'required',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50'
         ];
