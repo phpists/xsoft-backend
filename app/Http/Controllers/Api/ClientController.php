@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Media\DeleteMediaRequest;
 use App\Http\Requests\User\DeleteUserRequest;
 use App\Http\Requests\User\SaveClientMediaRequest;
 use App\Http\Requests\User\StoreUserRequest;
@@ -32,9 +33,12 @@ class ClientController extends CoreController
                 Route::get('get-client', [static::class, 'getClient']);
                 Route::delete('delete-client', [static::class, 'deleteClient']);
 
-
                 Route::get('get-users-categories', [static::class, 'getUsersCategories']);
+
                 Route::post('save-client-media', [static::class, 'saveClientMedia']);
+                Route::delete('delete-client-media', [static::class, 'deleteClientMedia']);
+
+
             }
         );
     }
@@ -43,6 +47,7 @@ class ClientController extends CoreController
     {
         $data = $request->all();
         $builder = User::query();
+        $builder->where('parent_id', auth()->id());
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -163,7 +168,6 @@ class ClientController extends CoreController
     public function saveClientMedia(SaveClientMediaRequest $request)
     {
         $data = $request->all();
-
         $user = User::find($data['user_id']);
 
         if (empty($user)) {
@@ -186,6 +190,22 @@ class ClientController extends CoreController
 
         return $this->responseSuccess([
             'user' => new UserResource($user),
+        ]);
+    }
+
+    public function deleteClientMedia(DeleteMediaRequest $request)
+    {
+        $data = $request->all();
+        $media = Media::where('id', $data['id'])->first();
+
+        if ($media) {
+            $a = FileService::removeFile('uploads', 'media', $media->file);
+
+            $media->delete();
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Медіа успішно видалений'
         ]);
     }
 }
