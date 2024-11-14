@@ -22,7 +22,7 @@ class StoreUserRequest extends FormRequest
             'bd_day' => 'required|date|before:today',
             'email' => 'required|string|email|unique:users,email',
             'comment' => 'nullable|string',
-            'phones' => 'required|array',
+            'phones' => 'required',
             'phones.*' => 'string|regex:/^380\d{9}$/',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50'

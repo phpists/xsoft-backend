@@ -9,6 +9,13 @@ class Product extends Model
 {
     use HasFactory;
 
+    /**
+     * Type phones
+     */
+    const TELEGRAM = 1;
+    const VIBER = 2;
+    const WHATSAPP = 3;
+
     protected $table = 'products';
     protected $fillable = [
         'user_id',

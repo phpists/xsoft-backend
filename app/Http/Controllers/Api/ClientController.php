@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\User\SaveClientMediaRequest;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Http\Resources\User\UsersResource;
@@ -11,9 +11,7 @@ use App\Models\Media;
 use App\Models\User;
 use App\Models\UserCategory;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class ClientController extends CoreController
@@ -33,6 +31,7 @@ class ClientController extends CoreController
 
 
                 Route::get('get-users-categories', [static::class, 'getUsersCategories']);
+                Route::post('save-client-media', [static::class, 'saveClientMedia']);
             }
         );
     }
@@ -133,6 +132,35 @@ class ClientController extends CoreController
     {
         return $this->responseSuccess([
             'categories' => UserCategory::all()
+        ]);
+    }
+
+    public function saveClientMedia(SaveClientMediaRequest $request)
+    {
+        $data = $request->all();
+
+        $user = User::find($data['user_id']);
+
+        if (empty($user)){
+            return $this->responseError([
+               'message' => 'Клієнт не знайдений'
+            ]);
+        }
+
+        if ($user) {
+            if ($request->hasFile('media')) {
+                foreach ($data['media'] as $media) {
+                    Media::create([
+                        'type_id' => Media::USER_MEDIA,
+                        'parent_id' => $user->id,
+                        'file' => FileService::saveFile('uploads', "media", $media),
+                    ]);
+                }
+            }
+        }
+
+        return $this->responseSuccess([
+            'user' => new UserResource($user),
         ]);
     }
 }
