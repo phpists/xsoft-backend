@@ -64,6 +64,7 @@ class ClientController extends CoreController
     {
         $data = $request->all();
         $user = User::create([
+            'parent_id' => auth()->id(),
             'role_id' => User::CUSTOMER,
             "category_id" => $data['category_id'],
             'first_name' => $data['first_name'],
@@ -143,7 +144,9 @@ class ClientController extends CoreController
     public function deleteClient(Request $request)
     {
         $data = $request->all();
-        User::whereIn('id', $data['idx'])->delete();
+        User::where('parent_id', auth()->id())
+            ->whereIn('id', $data['idx'])
+            ->delete();
 
         return $this->responseSuccess([
             'message' => 'Клієнти успішно видалені',
@@ -163,9 +166,9 @@ class ClientController extends CoreController
 
         $user = User::find($data['user_id']);
 
-        if (empty($user)){
+        if (empty($user)) {
             return $this->responseError([
-               'message' => 'Клієнт не знайдений'
+                'message' => 'Клієнт не знайдений'
             ]);
         }
 

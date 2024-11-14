@@ -19,6 +19,7 @@ class User extends Authenticatable
     const CUSTOMER = 2;
 
     protected $fillable = [
+        'parent_id',
         'role_id',
         'category_id',
         'first_name',
