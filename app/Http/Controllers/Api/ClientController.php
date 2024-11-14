@@ -79,6 +79,7 @@ class ClientController extends CoreController
             'bd_date' => User::setUserBd($data),
             'comment' => $data['comment'],
             'phones' => json_encode($data['phones']),
+            'tags' => json_encode($data['tags']),
             'email' => $data['email'],
             'password' => Hash::make(rand(1, 1000)),
         ]);
@@ -105,7 +106,8 @@ class ClientController extends CoreController
     {
         $data = $request->all();
 
-        $user = User::where('id', $data['id'])->update([
+        $user = User::where('id', $data['id'])->first();
+        $user->update([
             'role_id' => User::CUSTOMER,
             "category_id" => $data['category_id'],
             'first_name' => $data['first_name'],
@@ -115,6 +117,7 @@ class ClientController extends CoreController
             'bd_date' => User::setUserBd($data),
             'comment' => $data['comment'],
             'phones' => json_encode($data['phones']),
+            'tags' => json_encode($data['tags']),
             'email' => $data['email'],
         ]);
 
@@ -199,7 +202,7 @@ class ClientController extends CoreController
         $media = Media::where('id', $data['id'])->first();
 
         if ($media) {
-            $a = FileService::removeFile('uploads', 'media', $media->file);
+            FileService::removeFile('uploads', 'media', $media->file);
 
             $media->delete();
         }

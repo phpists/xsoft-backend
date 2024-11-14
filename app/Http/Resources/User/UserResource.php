@@ -26,7 +26,8 @@ class UserResource extends JsonResource
             'comment' => $this->comment,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'media' => new MediasResource($this->media)
+            'media' => new MediasResource($this->media),
+            'tags' => json_decode($this->tags),
         ];
 
         return $return;

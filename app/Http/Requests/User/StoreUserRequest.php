@@ -25,7 +25,7 @@ class StoreUserRequest extends FormRequest
             'phones' => 'required',
             'phones.*' => 'required',
             'tags' => 'nullable|array',
-            'tags.*' => 'string|max:50'
+            'tags.*' => 'string|max:500'
         ];
     }
 

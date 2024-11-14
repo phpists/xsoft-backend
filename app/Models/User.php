@@ -30,7 +30,8 @@ class User extends Authenticatable
         'phones',
         'color',
         'bd_date',
-        'comment'
+        'comment',
+        'tags'
     ];
 
     protected $hidden = [
