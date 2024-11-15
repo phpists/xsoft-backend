@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\SaveProductMedia;
+use App\Http\Requests\Product\SaveProductMediaRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductsResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
@@ -34,6 +36,9 @@ class ProductController extends CoreController
                 Route::post('update-product', [static::class, 'updateProduct']);
 
                 Route::get('get-product-info', [static::class, 'getProductInfo']);
+
+                Route::post('save-product-media', [static::class, 'saveProductMedia']);
+                Route::delete('delete-product-media', [static::class, 'deleteProductMedia']);
             }
         );
     }
@@ -170,6 +175,52 @@ class ProductController extends CoreController
             'measurements' => $measurements,
             'taxes' => $taxes,
             'warehouses' => $warehouses,
+        ]);
+    }
+
+    public function saveProductMedia(SaveProductMediaRequest $request)
+    {
+        $data = $request->all();
+        $product = Product::find($data['product_id']);
+
+        if (empty($product)) {
+            return $this->responseError([
+                'message' => 'Товар не знайдений'
+            ]);
+        }
+
+        if ($product) {
+            if ($request->hasFile('media')) {
+                foreach ($data['media'] as $media) {
+                    Media::create([
+                        'type_id' => Media::PRODUCT_MEDIA,
+                        'parent_id' => $product->id,
+                        'file' => FileService::saveFile('uploads', "media", $media),
+                    ]);
+                }
+            }
+        }
+
+        return $this->responseSuccess([
+            'product' => new ProductResource($product),
+        ]);
+    }
+
+    public function deleteProductMedia(Request $request)
+    {
+        $data = $request->all();
+        $media = Media::where('type_id', Media::PRODUCT_MEDIA)
+            ->where('id', $data['id'])
+            ->first();
+
+        if ($media) {
+            FileService::removeFile('uploads', 'media', $media->file);
+
+            $media->delete();
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Медіа успішно видалений'
         ]);
     }
 }

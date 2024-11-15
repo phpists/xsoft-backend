@@ -37,8 +37,6 @@ class ClientController extends CoreController
 
                 Route::post('save-client-media', [static::class, 'saveClientMedia']);
                 Route::delete('delete-client-media', [static::class, 'deleteClientMedia']);
-
-
             }
         );
     }
