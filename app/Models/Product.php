@@ -28,7 +28,11 @@ class Product extends Model
         'color',
         'balance',
         'materials_used_quantity',
-        'materials_used_measure_id'
+        'materials_used_measure_id',
+        'cost_price',
+        'retail_price',
+        'tags',
+        'vendors'
     ];
 
     public function productItem()

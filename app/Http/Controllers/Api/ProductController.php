@@ -16,6 +16,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\Taxes;
+use App\Models\Vendor;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -69,8 +70,12 @@ class ProductController extends CoreController
             'product_measure_id' => $data['product_measure_id'],
             'color' => $data['color'],
             'balance' => $data['balance'],
-            'materials_used_quantity' => $data['materials_used_quantity'],
-            'materials_used_measure_id' => $data['materials_used_measure_id'],
+            'cost_price' => $data['cost_price'],
+            'retail_price' => $data['retail_price'],
+            'tags' => isset($data['tags']) ? json_encode($data['tags']) : null,
+            'vendors' => isset($data['vendors']) ? json_encode($data['vendors']) : null,
+            'materials_used_quantity' => isset($data['materials_used_quantity']) ? $data['materials_used_quantity'] : null,
+            'materials_used_measure_id' => isset($data['materials_used_measure_id']) ? $data['materials_used_measure_id'] : null,
         ]);
 
         if (isset($data['items'])) {
@@ -115,8 +120,12 @@ class ProductController extends CoreController
             'product_measure_id' => $data['product_measure_id'],
             'color' => $data['color'],
             'balance' => $data['balance'],
-            'materials_used_quantity' => $data['materials_used_quantity'],
-            'materials_used_measure_id' => $data['materials_used_measure_id'],
+            'cost_price' => $data['cost_price'],
+            'retail_price' => $data['retail_price'],
+            'tags' => isset($data['tags']) ? json_encode($data['tags']) : null,
+            'vendors' => isset($data['vendors']) ? json_encode($data['vendors']) : null,
+            'materials_used_quantity' => isset($data['materials_used_quantity']) ? $data['materials_used_quantity'] : null,
+            'materials_used_measure_id' => isset($data['materials_used_measure_id']) ? $data['materials_used_measure_id'] : null,
         ]);
 
         if (isset($data['items'])) {
@@ -160,10 +169,9 @@ class ProductController extends CoreController
             $measurements = Measurement::all();
             $taxes = Taxes::all();
             $warehouses = Warehouse::all();
-
+            $vendors = Vendor::all();
 
             DB::commit();
-
         } catch (\Exception $exception) {
             DB::rollBack();
             return back()->withErrors(["Помилка: {$exception->getMessage()}"]);
@@ -175,6 +183,7 @@ class ProductController extends CoreController
             'measurements' => $measurements,
             'taxes' => $taxes,
             'warehouses' => $warehouses,
+            'vendors' => $vendors
         ]);
     }
 

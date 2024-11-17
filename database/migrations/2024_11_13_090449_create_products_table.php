@@ -22,8 +22,14 @@ return new class extends Migration {
             $table->string('color')->nullable();
             $table->bigInteger('balance')->default(0)->comment('Критичний залишок');
 
-            $table->bigInteger('materials_used_quantity')->comment('Витратні матеріали кількість');
-            $table->integer('materials_used_measure_id')->comment('Витратні матеріали одиниця вимиру');
+            $table->bigInteger('materials_used_quantity')->nullable()->comment('Витратні матеріали кількість');
+            $table->integer('materials_used_measure_id')->nullable()->comment('Витратні матеріали одиниця вимиру');
+
+            $table->float('cost_price')->nullable()->comment('Собівартість');
+            $table->float('retail_price')->nullable()->comment('Роздрібна ціна');
+            $table->json('tags')->nullable();
+            $table->json('vendors')->nullable();
+
             $table->timestamps();
         });
     }

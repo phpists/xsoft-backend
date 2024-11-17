@@ -25,6 +25,7 @@ return new class extends Migration {
             $table->string('color')->nullable();
             $table->date('bd_date')->nullable();
             $table->text('comment')->nullable();
+            $table->json('tags')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
