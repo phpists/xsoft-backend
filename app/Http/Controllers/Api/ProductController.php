@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\DeleteProductRequest;
+use App\Http\Requests\Product\GetProductRequest;
 use App\Http\Requests\Product\SaveProductMedia;
 use App\Http\Requests\Product\SaveProductMediaRequest;
 use App\Http\Resources\Product\ProductResource;
@@ -32,9 +34,11 @@ class ProductController extends CoreController
                 'middleware' => 'auth:api'
             ],
             function () {
+                Route::get('get-product', [static::class, 'getProduct']);
                 Route::get('get-products', [static::class, 'getProducts']);
                 Route::post('add-product', [static::class, 'addProduct']);
                 Route::post('update-product', [static::class, 'updateProduct']);
+                Route::delete('delete-product', [static::class, 'deleteProduct']);
 
                 Route::get('get-product-info', [static::class, 'getProductInfo']);
 
@@ -42,6 +46,24 @@ class ProductController extends CoreController
                 Route::delete('delete-product-media', [static::class, 'deleteProductMedia']);
             }
         );
+    }
+
+    public function getProduct(GetProductRequest $request)
+    {
+        $data = $request->all();
+        $product = Product::where('id', $data['id'])
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (empty($product)) {
+            return $this->responseError([
+                'message' => 'Товар не знайдений'
+            ]);
+        }
+
+        return $this->responseSuccess([
+            'product' => new ProductResource($product)
+        ]);
     }
 
     public function getProducts(Request $request)
@@ -156,6 +178,30 @@ class ProductController extends CoreController
         return $this->responseSuccess([
             'message' => 'Товар успішно відредагований',
             'product' => new ProductResource($product)
+        ]);
+    }
+
+    public function deleteProduct(DeleteProductRequest $request)
+    {
+        $data = $request->all();
+        $product = Product::where('id', $data['id'])
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (empty($product)) {
+            return $this->responseError([
+                'message' => 'Товар не знайдений'
+            ]);
+        }
+
+        if ($product) {
+            ProductItem::where('product_id', $data['id'])->delete();
+            Media::where('type_id', Media::PRODUCT_MEDIA)->where('parent_id', $data['id'])->delete();
+            $product->delete();
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Товар успешно удален'
         ]);
     }
 

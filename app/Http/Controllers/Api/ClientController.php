@@ -51,7 +51,6 @@ class ClientController extends CoreController
             $query = $data['q'];
             $builder->where('first_name', 'like', "%$query%")
                 ->orWhere('last_name', 'like', "%$query%")
-                ->orWhere('last_name', 'phone', "%$query%")
                 ->orWhere('email', 'like', "%$query%");
         }
 
