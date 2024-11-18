@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductCategory\ProductCategoryCreateRequest;
+use App\Http\Requests\ProductCategory\ProductCategoryDeleteRequest;
+use App\Http\Requests\ProductCategory\ProductCategoryUpdateRequest;
 use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -19,11 +21,13 @@ class ProductCategoryController extends CoreController
             ],
             function () {
                 Route::post('add-category', [static::class, 'addCategory']);
+                Route::post('edit-category', [static::class, 'editCategory']);
+                Route::delete('delete-category', [static::class, 'deleteCategory']);
             }
         );
     }
 
-    public function addCategory(Request $request)
+    public function addCategory(ProductCategoryCreateRequest $request)
     {
         $data = $request->all();
         $category = Category::create([
@@ -31,7 +35,32 @@ class ProductCategoryController extends CoreController
         ]);
 
         return $this->responseSuccess([
-           'category' => new CategoryResource($category),
+            'message' => 'Категорія успішно збережена',
+            'category' => new CategoryResource($category),
+        ]);
+    }
+
+    public function editCategory(ProductCategoryUpdateRequest $request)
+    {
+        $data = $request->all();
+        $category = Category::where('id', $data['id'])->first();
+        $category->update([
+            'title' => $data['title']
+        ]);
+
+        return $this->responseSuccess([
+            'message' => 'Категорія успішно відредагована',
+            'category' => new CategoryResource($category),
+        ]);
+    }
+
+    public function deleteCategory(ProductCategoryDeleteRequest $request)
+    {
+        $data = $request->all();
+        Category::where('id', $data['id'])->delete();
+
+        return $this->responseSuccess([
+            'message' => 'Категорія успішно видалена',
         ]);
     }
 }

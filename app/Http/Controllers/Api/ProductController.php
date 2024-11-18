@@ -183,10 +183,6 @@ class ProductController extends CoreController
     {
         $data = $request->all();
 
-        if (empty($product)) {
-            return $this->responseError('Товар не знайдений');
-        }
-
         ProductItem::whereIn('product_id', $data['idx'])->delete();
         Media::where('type_id', Media::PRODUCT_MEDIA)->whereIn('parent_id', $data['idx'])->delete();
         Product::whereIn('id', $data['idx'])->delete();
