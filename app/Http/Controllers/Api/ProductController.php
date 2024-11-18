@@ -56,9 +56,7 @@ class ProductController extends CoreController
             ->first();
 
         if (empty($product)) {
-            return $this->responseError([
-                'message' => 'Товар не знайдений'
-            ]);
+            return $this->responseError('Товар не знайдений');
         }
 
         return $this->responseSuccess([
@@ -184,21 +182,14 @@ class ProductController extends CoreController
     public function deleteProduct(DeleteProductRequest $request)
     {
         $data = $request->all();
-        $product = Product::where('id', $data['id'])
-            ->where('user_id', auth()->id())
-            ->first();
 
         if (empty($product)) {
-            return $this->responseError([
-                'message' => 'Товар не знайдений'
-            ]);
+            return $this->responseError('Товар не знайдений');
         }
 
-        if ($product) {
-            ProductItem::where('product_id', $data['id'])->delete();
-            Media::where('type_id', Media::PRODUCT_MEDIA)->where('parent_id', $data['id'])->delete();
-            $product->delete();
-        }
+        ProductItem::whereIn('product_id', $data['idx'])->delete();
+        Media::where('type_id', Media::PRODUCT_MEDIA)->whereIn('parent_id', $data['idx'])->delete();
+        Product::whereIn('id', $data['idx'])->delete();
 
         return $this->responseSuccess([
             'message' => 'Товар успешно удален'
@@ -239,9 +230,7 @@ class ProductController extends CoreController
         $product = Product::find($data['product_id']);
 
         if (empty($product)) {
-            return $this->responseError([
-                'message' => 'Товар не знайдений'
-            ]);
+            return $this->responseError('Товар не знайдений');
         }
 
         if ($product) {
