@@ -7,6 +7,8 @@ use App\Http\Requests\Product\DeleteProductRequest;
 use App\Http\Requests\Product\GetProductRequest;
 use App\Http\Requests\Product\SaveProductMedia;
 use App\Http\Requests\Product\SaveProductMediaRequest;
+use App\Http\Requests\Product\SaveProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductsResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
@@ -72,12 +74,17 @@ class ProductController extends CoreController
         $this->setSorting($builder, [
             'id' => 'id',
         ]);
+
+        if (isset($data['category_id'])){
+            $builder->where('category_id', $data['category_id']);
+        }
+
         $products = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
 
         return $this->responseSuccess(new ProductsResource($products, false));
     }
 
-    public function addProduct(Request $request)
+    public function addProduct(SaveProductRequest $request)
     {
         $data = $request->all();
         $product = Product::create([
@@ -125,28 +132,30 @@ class ProductController extends CoreController
         ]);
     }
 
-    public function updateProduct(Request $request)
+    public function updateProduct(UpdateProductRequest $request)
     {
         $data = $request->all();
 
         $product = Product::where('id', $data['id'])->first();
-        $product->update([
-            'user_id' => auth()->id(),
-            'brand_id' => $data['brand_id'],
-            'category_id' => $data['category_id'],
-            'article' => $data['article'],
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'product_measure_id' => $data['product_measure_id'],
-            'color' => $data['color'],
-            'balance' => $data['balance'],
-            'cost_price' => $data['cost_price'],
-            'retail_price' => $data['retail_price'],
-            'tags' => isset($data['tags']) ? json_encode($data['tags']) : null,
-            'vendors' => isset($data['vendors']) ? json_encode($data['vendors']) : null,
-            'materials_used_quantity' => isset($data['materials_used_quantity']) ? $data['materials_used_quantity'] : null,
-            'materials_used_measure_id' => isset($data['materials_used_measure_id']) ? $data['materials_used_measure_id'] : null,
-        ]);
+        if ($product) {
+            $product->update([
+                'user_id' => auth()->id(),
+                'brand_id' => $data['brand_id'],
+                'category_id' => $data['category_id'],
+                'article' => $data['article'],
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'product_measure_id' => $data['product_measure_id'],
+                'color' => $data['color'],
+                'balance' => $data['balance'],
+                'cost_price' => $data['cost_price'],
+                'retail_price' => $data['retail_price'],
+                'tags' => isset($data['tags']) ? json_encode($data['tags']) : null,
+                'vendors' => isset($data['vendors']) ? json_encode($data['vendors']) : null,
+                'materials_used_quantity' => isset($data['materials_used_quantity']) ? $data['materials_used_quantity'] : null,
+                'materials_used_measure_id' => isset($data['materials_used_measure_id']) ? $data['materials_used_measure_id'] : null,
+            ]);
+        }
 
         if (isset($data['items'])) {
             foreach ($data['items'] as $item) {

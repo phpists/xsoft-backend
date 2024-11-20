@@ -15,7 +15,7 @@ class ProductCategoryCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required'
+            'title' => 'required|unique:categories,title',
         ];
     }
 }
