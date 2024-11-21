@@ -47,7 +47,7 @@ class CompanyController extends CoreController
             'title' => $data['title'],
             'user_id' => auth()->id(),
             'category_id' => $data['category_id'],
-            'color' => $data['color']
+            'color' => $data['color'],
         ]);
 
         if ($company) {
@@ -55,7 +55,8 @@ class CompanyController extends CoreController
                 foreach ($data['locations'] as $location) {
                     CompanyBranches::create([
                         'company_id' => $company->id,
-                        'location' => $location['title']
+                        'location' => $location['title'],
+                        'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
                     ]);
                 }
             }
@@ -75,7 +76,7 @@ class CompanyController extends CoreController
             'title' => $data['title'],
             'user_id' => auth()->id(),
             'category_id' => $data['category_id'],
-            'color' => $data['color']
+            'color' => $data['color'],
         ]);
 
         if (count($data['locations'])) {
@@ -84,7 +85,8 @@ class CompanyController extends CoreController
                     'id' => $location['id']
                 ], [
                     'company_id' => $company->id,
-                    'location' => $location['title']
+                    'location' => $location['title'],
+                    'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
                 ]);
             }
         }

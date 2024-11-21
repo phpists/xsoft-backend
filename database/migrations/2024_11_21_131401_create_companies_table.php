@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->bigInteger('user_id');
             $table->bigInteger('category_id');
+            $table->string('color');
             $table->timestamps();
         });
     }

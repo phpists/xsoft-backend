@@ -16,7 +16,8 @@ class StoreCompanyRequest extends FormRequest
         return [
             'title' => 'required',
             'category_id' => 'required|integer|exists:categories,id',
-            'locations' => 'required'
+            'locations' => 'required',
+            'phones' => 'sometimes'
         ];
     }
 }

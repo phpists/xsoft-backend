@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('company_id');
             $table->string('location');
+            $table->json('phones');
             $table->timestamps();
         });
     }

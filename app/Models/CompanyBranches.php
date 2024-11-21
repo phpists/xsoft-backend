@@ -12,6 +12,7 @@ class CompanyBranches extends Model
     protected $table = 'companies_branches';
     protected $fillable = [
         'company_id',
-        'location'
+        'location',
+        'phones'
     ];
 }
