@@ -17,6 +17,8 @@ class User extends Authenticatable
      */
     const ADMIN = 1;
     const CUSTOMER = 2;
+    const MIDDLE_ADMIN = 3;
+    const STAFF = 4;
 
     protected $fillable = [
         'parent_id',
@@ -63,5 +65,10 @@ class User extends Authenticatable
         } else {
             return null;
         }
+    }
+
+    public function getCurrentCompanyId()
+    {
+        return $this->company->id;
     }
 }

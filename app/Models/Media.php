@@ -14,6 +14,7 @@ class Media extends Model
      */
     const USER_MEDIA = 1;
     const PRODUCT_MEDIA = 2;
+    const STAFF_MEDIA = 3;
 
     protected $table = 'media';
     protected $fillable = [
