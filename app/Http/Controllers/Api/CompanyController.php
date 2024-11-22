@@ -60,6 +60,7 @@ class CompanyController extends CoreController
                 foreach ($data['locations'] as $location) {
                     CompanyBranches::create([
                         'company_id' => $company->id,
+                        'title' => $location['name'],
                         'location' => $location['title'],
                         'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
                     ]);
@@ -90,6 +91,7 @@ class CompanyController extends CoreController
                     'id' => $location['id']
                 ], [
                     'company_id' => $company->id,
+                    'title' => $location['name'],
                     'location' => $location['title'],
                     'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
                 ]);

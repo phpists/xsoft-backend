@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('companies_branches', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id');
+            $table->string('title');
             $table->string('location');
             $table->json('phones');
             $table->timestamps();
