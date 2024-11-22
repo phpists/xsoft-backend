@@ -20,6 +20,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'parent_id',
+        'company_id',
         'role_id',
         'category_id',
         'first_name',
@@ -44,6 +45,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function company()
+    {
+        return $this->hasOne(Company::class, 'id', 'company_id');
+    }
+
     public function media()
     {
         return $this->hasMany(Media::class, 'parent_id', 'id')
@@ -52,8 +58,8 @@ class User extends Authenticatable
 
     public static function setUserBd($params)
     {
-        if ($params['bd_day']){
-            return date('Y-m-d', strtotime( $params['bd_day']));
+        if ($params['bd_day']) {
+            return date('Y-m-d', strtotime($params['bd_day']));
         } else {
             return null;
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\User;
 
+use App\Http\Resources\Company\CompanyResource;
 use App\Http\Resources\Media\MediaResource;
 use App\Http\Resources\Media\MediasResource;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class UserResource extends JsonResource
             'updated_at' => $this->updated_at,
             'media' => new MediasResource($this->media),
             'tags' => json_decode($this->tags),
+            'company' => new CompanyResource($this->company),
         ];
 
         return $return;

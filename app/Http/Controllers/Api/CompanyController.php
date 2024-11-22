@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Company\SetCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Company\CompaniesResource;
 use App\Http\Resources\Company\CompanyResource;
+use App\Http\Resources\User\UserResource;
 use App\Models\Company;
 use App\Models\CompanyBranches;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +31,8 @@ class CompanyController extends CoreController
                 Route::post('add-company', [static::class, 'addCompany']);
                 Route::post('edit-company', [static::class, 'editCompany']);
                 Route::delete('delete-company', [static::class, 'deleteCompany']);
+
+                Route::post('set-company', [static::class, 'setCompany']);
             }
         );
     }
@@ -106,6 +111,30 @@ class CompanyController extends CoreController
 
         return $this->responseSuccess([
             'message' => 'Компанія успішно видалена'
+        ]);
+    }
+
+    /**
+     * Встановити копанію по замовчуванню
+     * @param SetCompanyRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setCompany(SetCompanyRequest $request)
+    {
+        $data = $request->all();
+        $user = User::find(auth()->id());
+
+        if (empty($user)){
+            return $this->responseError('User not found');
+        }
+
+        $user->update([
+            'company_id' => $data['company_id']
+        ]);
+
+        return $this->responseSuccess([
+            'message' => 'Компанія успішно встановлена',
+            'user' => new UserResource($user),
         ]);
     }
 }

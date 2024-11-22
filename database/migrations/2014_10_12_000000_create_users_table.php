@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('parent_id')->comment('Власник клієнтів');
             $table->integer('role_id')->default(\App\Models\User::CUSTOMER);
+            $table->integer('company_id')->nullable();
             $table->integer('category_id')->nullable();
             $table->string('first_name');
             $table->string('last_name');
