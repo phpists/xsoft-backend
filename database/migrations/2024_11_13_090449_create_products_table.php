@@ -12,7 +12,8 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
+            $table->bigInteger('company_id')->comment('Компанія до якої належить продукт');
+            $table->bigInteger('user_id')->comment('Хто створив товар');
             $table->bigInteger('brand_id');
             $table->bigInteger('category_id');
             $table->string('article')->comment('Артикль');

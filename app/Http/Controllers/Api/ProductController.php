@@ -20,6 +20,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\Taxes;
+use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -69,7 +70,10 @@ class ProductController extends CoreController
     public function getProducts(Request $request)
     {
         $data = $request->all();
+        $auth = User::find(auth()->id());
+
         $builder = Product::query();
+        $builder->where('company_id', $auth->getCurrentCompanyId());
         $builder->where('user_id', auth()->id());
         $this->setSorting($builder, [
             'id' => 'id',
@@ -87,7 +91,9 @@ class ProductController extends CoreController
     public function addProduct(SaveProductRequest $request)
     {
         $data = $request->all();
+        $auth = User::find(auth()->id());
         $product = Product::create([
+            'company_id' => $auth->getCurrentCompanyId(),
             'user_id' => auth()->id(),
             'brand_id' => $data['brand_id'],
             'category_id' => $data['category_id'],

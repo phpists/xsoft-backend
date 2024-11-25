@@ -65,7 +65,10 @@ class StaffController extends CoreController
     public function getStaff(Request $request)
     {
         $data = $request->all();
-        $staff = User::find($data['id']);
+        $auth = User::find(auth()->id());
+        $staff = User::where('company_id', $auth->getCurrentCompanyId())
+            ->where('id', $data['id'])
+            ->first();
 
         if (empty($staff)){
             return $this->responseError('Співробітника з таким id не знайдено');
