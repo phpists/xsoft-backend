@@ -15,6 +15,8 @@ class CompanyBrancheResource extends JsonResource
             'company_id' => $this->company_id,
             'title' => $this->title,
             'location' => $this->location,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'phones' => json_decode($this->phones),
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s')
         ];

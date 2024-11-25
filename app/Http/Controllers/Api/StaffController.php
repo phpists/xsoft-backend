@@ -28,6 +28,7 @@ class StaffController extends CoreController
             ],
             function () {
                 Route::get('get-all-staff', [static::class, 'getAllStaff']);
+                Route::get('get-staff', [static::class, 'getStaff']);
                 Route::post('add-staff', [static::class, 'addStaff']);
                 Route::post('edit-staff', [static::class, 'editStaff']);
                 Route::delete('delete-staff', [static::class, 'deleteStaff']);
@@ -44,7 +45,7 @@ class StaffController extends CoreController
 
         $builder = User::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->whereIn('role_id', [User::STAFF]);
+        $builder->whereIn('role_id', [User::STAFF, User::CUSTOMER]);
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -59,6 +60,20 @@ class StaffController extends CoreController
         $staffs = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
 
         return $this->responseSuccess(new StaffAllResource($staffs, false));
+    }
+
+    public function getStaff(Request $request)
+    {
+        $data = $request->all();
+        $staff = User::find($data['id']);
+
+        if (empty($staff)){
+            return $this->responseError('Співробітника з таким id не знайдено');
+        }
+
+        return $this->responseSuccess([
+           'staff' => new StaffResource($staff)
+        ]);
     }
 
     public function addStaff(SaveStaffRequest $request)
