@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\DeleteStaffRequest;
 use App\Http\Requests\Staff\SaveStaffRequest;
+use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
 use App\Http\Resources\Staff\StaffResource;
 use App\Http\Resources\User\UserResource;
@@ -26,6 +28,8 @@ class StaffController extends CoreController
             function () {
                 Route::get('get-all-staff', [static::class, 'getAllStaff']);
                 Route::post('add-staff', [static::class, 'addStaff']);
+                Route::post('edit-staff', [static::class, 'editStaff']);
+                Route::delete('delete-staff', [static::class, 'deleteStaff']);
             }
         );
     }
@@ -37,7 +41,7 @@ class StaffController extends CoreController
 
         $builder = User::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->whereIn('role_id', [ User::STAFF]);
+        $builder->whereIn('role_id', [User::STAFF]);
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -84,6 +88,52 @@ class StaffController extends CoreController
         return $this->responseSuccess([
             'message' => 'Працівник успішно збережений',
             'staff' => new StaffResource($staff),
+        ]);
+    }
+
+    public function editStaff(UpdateStaffRequest $request)
+    {
+        $data = $request->all();
+        $auth = User::find(auth()->id());
+        $staff = User::find($data['id']);
+        $staff->update([
+            'company_id' => $auth->getCurrentCompanyId(),
+            'role_id' => $data['role_id'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'color' => $data['color'],
+            'comment' => $data['comment'],
+            'password' => Hash::make(rand(1, 1000)),
+        ]);
+
+        if ($staff) {
+            if ($request->hasFile('media')) {
+                foreach ($data['media'] as $media) {
+                    Media::create([
+                        'type_id' => Media::STAFF_MEDIA,
+                        'parent_id' => $staff->id,
+                        'file' => FileService::saveFile('uploads', "media", $media),
+                    ]);
+                }
+            }
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Працівник успішно відредагований',
+            'staff' => new StaffResource($staff),
+        ]);
+    }
+
+    public function deleteStaff(DeleteStaffRequest $request)
+    {
+        $data = $request->all();
+        $auth = User::find(auth()->id());
+        User::where('company_id', $auth->getCurrentCompanyId())
+            ->whereIn('id', $data['idx'])
+            ->delete();
+
+        return $this->responseSuccess([
+            'message' => 'Працівник успішно видалені',
         ]);
     }
 }
