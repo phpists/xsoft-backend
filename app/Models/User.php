@@ -58,6 +58,12 @@ class User extends Authenticatable
             ->where('type_id', Media::USER_MEDIA);
     }
 
+    public function staffMedia()
+    {
+        return $this->hasMany(Media::class, 'parent_id', 'id')
+            ->where('type_id', Media::STAFF_MEDIA);
+    }
+
     public static function setUserBd($params)
     {
         if ($params['bd_day']) {

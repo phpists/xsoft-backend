@@ -22,7 +22,7 @@ class StaffResource extends JsonResource
             'comment' => $this->comment,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'media' => isset($this->media) ? new MediasResource($this->media) : null,
+            'media' => isset($this->staffMedia) ? new MediasResource($this->staffMedia) : null,
         ];
 
         return $return;

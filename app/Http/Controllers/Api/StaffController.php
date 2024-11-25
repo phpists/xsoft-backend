@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\DeleteStaffMediaRequest;
 use App\Http\Requests\Staff\DeleteStaffRequest;
+use App\Http\Requests\Staff\SaveStaffMediaRequest;
 use App\Http\Requests\Staff\SaveStaffRequest;
 use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
@@ -34,6 +36,9 @@ class StaffController extends CoreController
                 Route::delete('delete-staff', [static::class, 'deleteStaff']);
 
                 Route::get('generate-password', [static::class, 'generatePassword']);
+
+                Route::post('save-staff-media', [static::class, 'saveStaffMedia']);
+                Route::delete('delete-staff-media', [static::class, 'deleteStaffMedia']);
             }
         );
     }
@@ -70,12 +75,12 @@ class StaffController extends CoreController
             ->where('id', $data['id'])
             ->first();
 
-        if (empty($staff)){
+        if (empty($staff)) {
             return $this->responseError('Співробітника з таким id не знайдено');
         }
 
         return $this->responseSuccess([
-           'staff' => new StaffResource($staff)
+            'staff' => new StaffResource($staff)
         ]);
     }
 
@@ -91,7 +96,7 @@ class StaffController extends CoreController
             'color' => $data['color'],
             'email' => $data['email'],
             'comment' => $data['comment'],
-            'password' => $data['password'],
+            'password' => Hash::make($data['password']),
         ]);
 
         if ($staff) {
@@ -117,15 +122,21 @@ class StaffController extends CoreController
         $data = $request->all();
         $auth = User::find(auth()->id());
         $staff = User::find($data['id']);
-        $staff->update([
+
+        $params = [
             'company_id' => $auth->getCurrentCompanyId(),
             'role_id' => $data['role_id'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'color' => $data['color'],
             'comment' => $data['comment'],
-            'password' => $data['password'],
-        ]);
+        ];
+
+        if ($data['password']) {
+            $params['password'] = Hash::make($data['password']);
+        }
+
+        $staff->update($params);
 
         if ($staff) {
             if ($request->hasFile('media')) {
@@ -161,7 +172,49 @@ class StaffController extends CoreController
     public function generatePassword(Request $request)
     {
         return $this->responseSuccess([
-           'password' => Str::random(5)
+            'password' => Str::random(5)
+        ]);
+    }
+
+    public function saveStaffMedia(SaveStaffMediaRequest $request)
+    {
+        $data = $request->all();
+        $staff = User::where('id', $data['staff_id'])->first();
+
+        if (empty($staff)) {
+            return $this->responseError('Працівник не знайдений');
+        }
+
+        if ($staff) {
+            if ($request->hasFile('media')) {
+                foreach ($data['media'] as $media) {
+                    Media::create([
+                        'type_id' => Media::STAFF_MEDIA,
+                        'parent_id' => $staff->id,
+                        'file' => FileService::saveFile('uploads', "media", $media),
+                    ]);
+                }
+            }
+        }
+
+        return $this->responseSuccess([
+            'staff' => new StaffResource($staff),
+        ]);
+    }
+
+    public function deleteStaffMedia(DeleteStaffMediaRequest $request)
+    {
+        $data = $request->all();
+        $media = Media::where('id', $data['id'])->first();
+
+        if ($media) {
+            FileService::removeFile('uploads', 'media', $media->file);
+
+            $media->delete();
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Медіа успішно видалений'
         ]);
     }
 }
