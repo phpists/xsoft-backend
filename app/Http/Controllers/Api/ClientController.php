@@ -44,8 +44,12 @@ class ClientController extends CoreController
     public function getClients(Request $request)
     {
         $data = $request->all();
+        $auth = User::find(auth()->id());
+
         $builder = User::query();
+        $builder->where('company_id', $auth->getCurrentCompanyId());
         $builder->where('parent_id', auth()->id());
+        $builder->where('role_id', User::CUSTOMER);
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -65,7 +69,9 @@ class ClientController extends CoreController
     public function addClient(StoreUserRequest $request)
     {
         $data = $request->all();
+        $auth = User::find(auth()->id());
         $user = User::create([
+            'company_id' => $auth->getCurrentCompanyId(),
             'parent_id' => auth()->id(),
             'role_id' => User::CUSTOMER,
             "category_id" => $data['category_id'],
