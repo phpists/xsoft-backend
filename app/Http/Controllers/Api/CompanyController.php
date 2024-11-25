@@ -63,6 +63,8 @@ class CompanyController extends CoreController
                         'title' => $location['name'],
                         'location' => $location['title'],
                         'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
+                        'latitude' => $location['latitude'],
+                        'longitude' => $location['longitude'],
                     ]);
                 }
             }
@@ -94,6 +96,8 @@ class CompanyController extends CoreController
                     'title' => $location['name'],
                     'location' => $location['title'],
                     'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
+                    'latitude' => $location['latitude'],
+                    'longitude' => $location['longitude'],
                 ]);
             }
         }

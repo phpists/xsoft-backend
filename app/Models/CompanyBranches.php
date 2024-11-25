@@ -18,6 +18,9 @@ class CompanyBranches extends Model
         'company_id',
         'title',
         'location',
-        'phones'
+        'phones',
+        'latitude',
+        'longitude',
     ];
 }
+

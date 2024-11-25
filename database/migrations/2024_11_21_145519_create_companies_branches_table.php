@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('location');
             $table->json('phones');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->timestamps();
         });
     }

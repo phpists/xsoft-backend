@@ -17,7 +17,9 @@ class StoreCompanyRequest extends FormRequest
             'title' => 'required',
             'category_id' => 'required|integer|exists:categories,id',
             'locations' => 'required',
-            'phones' => 'sometimes'
+            'phones' => 'sometimes',
+            'latitude' => 'sometimes',
+            'longitude' => 'sometimes',
         ];
     }
 }
