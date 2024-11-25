@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class StaffController extends CoreController
 {
@@ -30,6 +31,8 @@ class StaffController extends CoreController
                 Route::post('add-staff', [static::class, 'addStaff']);
                 Route::post('edit-staff', [static::class, 'editStaff']);
                 Route::delete('delete-staff', [static::class, 'deleteStaff']);
+
+                Route::get('generate-password', [static::class, 'generatePassword']);
             }
         );
     }
@@ -70,7 +73,7 @@ class StaffController extends CoreController
             'color' => $data['color'],
             'email' => $data['email'],
             'comment' => $data['comment'],
-            'password' => Hash::make(rand(1, 1000)),
+            'password' => $data['password'],
         ]);
 
         if ($staff) {
@@ -103,7 +106,7 @@ class StaffController extends CoreController
             'last_name' => $data['last_name'],
             'color' => $data['color'],
             'comment' => $data['comment'],
-            'password' => Hash::make(rand(1, 1000)),
+            'password' => $data['password'],
         ]);
 
         if ($staff) {
@@ -134,6 +137,13 @@ class StaffController extends CoreController
 
         return $this->responseSuccess([
             'message' => 'Працівник успішно видалені',
+        ]);
+    }
+
+    public function generatePassword(Request $request)
+    {
+        return $this->responseSuccess([
+           'password' => Str::random(5)
         ]);
     }
 }

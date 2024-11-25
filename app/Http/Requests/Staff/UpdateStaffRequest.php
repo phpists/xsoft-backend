@@ -21,6 +21,7 @@ class UpdateStaffRequest extends FormRequest
             'color' => 'sometimes',
             'email' => 'sometimes',
             'comment' => 'nullable|string',
+            'password' => 'required'
         ];
     }
 }
