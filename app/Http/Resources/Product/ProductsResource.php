@@ -14,7 +14,7 @@ class ProductsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return $this->returnPaginatedResource(function ($item, $key) {
-            return new ProductResource($item, $this->fullInfo);
+            return new ProductResource($item);
         });
     }
 }

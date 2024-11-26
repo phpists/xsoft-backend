@@ -10,7 +10,6 @@ use App\Http\Requests\Staff\SaveStaffRequest;
 use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
 use App\Http\Resources\Staff\StaffResource;
-use App\Http\Resources\User\UserResource;
 use App\Http\Services\FileService;
 use App\Models\Media;
 use App\Models\User;
@@ -49,8 +48,7 @@ class StaffController extends CoreController
         $auth = User::find(auth()->id());
 
         $builder = User::query();
-        $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->whereIn('role_id', [User::STAFF, User::CUSTOMER]);
+        $builder->where('parent_id', $auth->id);
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -89,6 +87,7 @@ class StaffController extends CoreController
         $data = $request->all();
         $auth = User::find(auth()->id());
         $staff = User::create([
+            'parent_id' => $auth->id,
             'company_id' => $auth->getCurrentCompanyId(),
             'role_id' => $data['role_id'],
             'first_name' => $data['first_name'],

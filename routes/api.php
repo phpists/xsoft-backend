@@ -10,5 +10,7 @@ use Illuminate\Support\Facades\Route;
 \App\Http\Controllers\Api\CompanyController::routers();
 \App\Http\Controllers\Api\RoleController::routers();
 \App\Http\Controllers\Api\StaffController::routers();
+\App\Http\Controllers\Api\BrandController::routers();
+
 
 
