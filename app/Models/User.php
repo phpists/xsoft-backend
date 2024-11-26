@@ -64,6 +64,11 @@ class User extends Authenticatable
             ->where('type_id', Media::STAFF_MEDIA);
     }
 
+    public function userBranch()
+    {
+        return $this->hasMany(UserBranch::class, 'user_id', 'id');
+    }
+
     public static function setUserBd($params)
     {
         if ($params['bd_day']) {
@@ -81,5 +86,12 @@ class User extends Authenticatable
     public function isSuperAdmin()
     {
         return $this->role_id == User::SUPER_ADMIN ? true : false;
+    }
+
+    public function getUserBranch()
+    {
+        return CompanyBranches::leftJoin('users_branches', 'users_branches.branch_id', 'companies_branches.id')
+            ->where('users_branches.user_id', $this->id)
+            ->get();
     }
 }

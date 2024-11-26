@@ -15,6 +15,7 @@ use App\Models\Department;
 use App\Models\Media;
 use App\Models\Position;
 use App\Models\User;
+use App\Models\UserBranch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -115,6 +116,18 @@ class StaffController extends CoreController
             }
         }
 
+        if (isset($data['branches'])){
+            foreach ($data['branches'] as $branchId){
+                UserBranch::updateOrCreate([
+                    'user_id' => $staff->id,
+                    'branch_id' => $branchId
+                ], [
+                    'user_id' => $staff->id,
+                    'branch_id' => $branchId
+                ]);
+            }
+        }
+
         return $this->responseSuccess([
             'message' => 'Працівник успішно збережений',
             'staff' => new StaffResource($staff),
@@ -155,6 +168,18 @@ class StaffController extends CoreController
                         'file' => FileService::saveFile('uploads', "media", $media),
                     ]);
                 }
+            }
+        }
+
+        if (isset($data['branches'])){
+            foreach ($data['branches'] as $branchId){
+                UserBranch::updateOrCreate([
+                    'user_id' => $auth->id,
+                    'branch_id' => $branchId
+                ], [
+                    'user_id' => $auth->id,
+                    'branch_id' => $branchId
+                ]);
             }
         }
 

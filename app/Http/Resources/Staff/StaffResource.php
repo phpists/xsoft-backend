@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Staff;
 
+use App\Http\Resources\CompanyBranches\CompanyBranchesResource;
 use App\Http\Resources\Media\MediasResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,6 +25,7 @@ class StaffResource extends JsonResource
             'updated_at' => $this->updated_at,
             'phones' => json_decode($this->phones),
             'media' => isset($this->staffMedia) ? new MediasResource($this->staffMedia) : null,
+            'branches' => isset($this->userBranch) ? new CompanyBranchesResource($this->getUserBranch()) : null
         ];
 
         return $return;

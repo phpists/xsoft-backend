@@ -21,7 +21,8 @@ class SaveStaffRequest extends FormRequest
             'email' => 'required|string|email|unique:users,email',
             'comment' => 'nullable|string',
             'password' => 'required',
-            'phones' => 'sometimes'
+            'phones' => 'sometimes',
+            'branches' => 'sometimes'
         ];
     }
 }
