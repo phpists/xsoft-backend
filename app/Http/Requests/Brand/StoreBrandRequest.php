@@ -15,7 +15,8 @@ class StoreBrandRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255|unique:brands,title',
-            'description' => 'sometimes'
+            'description' => 'sometimes',
+            'color' => 'sometimes'
         ];
     }
 }

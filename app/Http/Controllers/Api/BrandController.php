@@ -57,8 +57,9 @@ class BrandController extends CoreController
     {
         $data = $request->all();
         $brand = Brand::create([
-           'title' => $data['title'],
-           'description' => $data['description']
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'color' => $data['color'],
         ]);
 
         return $this->responseSuccess([
@@ -72,7 +73,8 @@ class BrandController extends CoreController
         $brand = Brand::find($data['id']);
         $brand->update([
             'title' => $data['title'],
-            'description' => $data['description']
+            'description' => $data['description'],
+            'color' => $data['color'],
         ]);
 
         return $this->responseSuccess([
@@ -83,10 +85,7 @@ class BrandController extends CoreController
     public function deleteBrand(GetBrandRequest $request)
     {
         $data = $request->all();
-        $brand = Brand::find($data['id']);
-        if ($brand){
-            $brand->delete();
-        }
+        Brand::whereIn('id', $data['idx'])->delete();
 
         return $this->responseSuccess([
             'message' => 'Бренд успішно видалений'

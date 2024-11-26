@@ -11,9 +11,12 @@ use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
 use App\Http\Resources\Staff\StaffResource;
 use App\Http\Services\FileService;
+use App\Models\Department;
 use App\Models\Media;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -34,6 +37,7 @@ class StaffController extends CoreController
                 Route::post('edit-staff', [static::class, 'editStaff']);
                 Route::delete('delete-staff', [static::class, 'deleteStaff']);
 
+                Route::get('get-staff-info', [static::class, 'getStaffInfo']);
                 Route::get('generate-password', [static::class, 'generatePassword']);
 
                 Route::post('save-staff-media', [static::class, 'saveStaffMedia']);
@@ -170,6 +174,26 @@ class StaffController extends CoreController
 
         return $this->responseSuccess([
             'message' => 'Працівник успішно видалені',
+        ]);
+    }
+
+    public function getStaffInfo()
+    {
+        try {
+            DB::beginTransaction();
+
+            $positions = Position::all();
+            $departments = Department::all();
+
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return back()->withErrors(["Помилка: {$exception->getMessage()}"]);
+        }
+
+        return $this->responseSuccess([
+            'positions' => $positions,
+            'departments' => $departments
         ]);
     }
 

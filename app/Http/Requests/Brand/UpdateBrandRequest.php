@@ -16,7 +16,8 @@ class UpdateBrandRequest extends FormRequest
         return [
             'id' => 'required|integer|exists:brands,id',
             'title' => 'required|string|max:255',
-            'description' => 'sometimes'
+            'description' => 'sometimes',
+            'color' => 'sometimes'
         ];
     }
 }

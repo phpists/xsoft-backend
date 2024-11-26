@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Brand extends Model
+class Position extends Model
 {
+    /**
+     * Посади
+     */
     use HasFactory;
 
-    protected $table = 'brands';
+    protected $table = 'positions';
     protected $fillable = [
-        'title',
-        'description',
-        'color'
+      'title'
     ];
 }

@@ -15,8 +15,10 @@ use App\Http\Resources\Traits\HasFullInfoFlag;
 use App\Http\Services\FileService;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Department;
 use App\Models\Measurement;
 use App\Models\Media;
+use App\Models\Position;
 use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\Taxes;
@@ -79,7 +81,7 @@ class ProductController extends CoreController
             'id' => 'id',
         ]);
 
-        if (isset($data['category_id'])){
+        if (isset($data['category_id'])) {
             $builder->where('category_id', $data['category_id']);
         }
 
@@ -218,6 +220,8 @@ class ProductController extends CoreController
             $taxes = Taxes::all();
             $warehouses = Warehouse::all();
             $vendors = Vendor::all();
+            $positions = Position::all();
+            $departments = Department::all();
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -231,7 +235,9 @@ class ProductController extends CoreController
             'measurements' => $measurements,
             'taxes' => $taxes,
             'warehouses' => $warehouses,
-            'vendors' => $vendors
+            'vendors' => $vendors,
+            'positions' => $positions,
+            'departments' => $departments
         ]);
     }
 

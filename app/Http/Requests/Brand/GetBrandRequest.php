@@ -14,7 +14,7 @@ class GetBrandRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:brands,id',
+            'idx.*' => 'required|integer|exists:brands,id',
         ];
     }
 }
