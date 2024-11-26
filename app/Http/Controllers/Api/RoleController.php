@@ -26,7 +26,7 @@ class RoleController extends CoreController
     public function getRoles(Request $request)
     {
         $roles = Role::whereNotIn('id', [
-            User::ADMIN, User::MIDDLE_ADMIN, User::MANAGER,
+            User::SUPER_ADMIN, User::ADMIN,
         ])->get();
 
         return $this->responseSuccess([

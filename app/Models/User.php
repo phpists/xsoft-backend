@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,11 +14,11 @@ class User extends Authenticatable
     /**
      * User
      */
-    const ADMIN = 1;
-    const CUSTOMER = 2;
-    const MIDDLE_ADMIN = 3;
-    const STAFF = 4;
+    const SUPER_ADMIN = 1;
+    const ADMIN = 3;
     const MANAGER = 5;
+    const CUSTOMER = 2;
+    const STAFF = 4;
 
     protected $fillable = [
         'parent_id',

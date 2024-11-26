@@ -61,7 +61,7 @@ class AuthController extends CoreController
 
         try {
             $user = new User();
-            $user->role_id = User::CUSTOMER;
+            $user->role_id = User::ADMIN;
             $user->first_name = $input['first_name'];
             $user->last_name = $input['last_name'];
             $user->email = $input['email'];
