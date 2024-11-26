@@ -75,6 +75,11 @@ class User extends Authenticatable
 
     public function getCurrentCompanyId()
     {
-        return $this->company->id;
+        return $this->company_id;
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role_id == User::SUPER_ADMIN ? true : false;
     }
 }

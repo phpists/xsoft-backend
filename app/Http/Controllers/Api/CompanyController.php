@@ -39,8 +39,13 @@ class CompanyController extends CoreController
 
     public function getCompanies(Request $request)
     {
-        $companies = Company::where('user_id', auth()->id())
-            ->get();
+        if (auth()->user()->isSuperAdmin()) {
+            $companies = Company::where('user_id', auth()->id())
+                ->get();
+        } else {
+            $companies = Company::where('id', auth()->user()->company_id)
+                ->get();
+        }
 
         return $this->responseSuccess(new CompaniesResource($companies));
     }
