@@ -97,6 +97,7 @@ class StaffController extends CoreController
             'email' => $data['email'],
             'comment' => $data['comment'],
             'password' => Hash::make($data['password']),
+            'phones' => json_encode($data['phones']),
         ]);
 
         if ($staff) {
@@ -132,7 +133,11 @@ class StaffController extends CoreController
             'comment' => $data['comment'],
         ];
 
-        if ($data['password']) {
+        if (isset($data['phones'])) {
+            $params['phones'] = json_encode($data['phones']);
+        }
+
+        if (isset($data['password'])) {
             $params['password'] = Hash::make($data['password']);
         }
 
