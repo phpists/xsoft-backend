@@ -11,6 +11,7 @@ use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
 use App\Http\Resources\Staff\StaffResource;
 use App\Http\Services\FileService;
+use App\Mail\StoreStaffMail;
 use App\Models\Department;
 use App\Models\Media;
 use App\Models\Position;
@@ -19,6 +20,7 @@ use App\Models\UserBranch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -105,6 +107,8 @@ class StaffController extends CoreController
         ]);
 
         if ($staff) {
+            Mail::to($data['email'])->send(new StoreStaffMail($staff, $data['password']));
+
             if ($request->hasFile('media')) {
                 foreach ($data['media'] as $media) {
                     Media::create([

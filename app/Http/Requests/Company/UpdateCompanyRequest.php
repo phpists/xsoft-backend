@@ -17,7 +17,7 @@ class UpdateCompanyRequest extends FormRequest
             'id' => 'required|integer|exists:companies,id',
             'title' => 'required',
             'category_id' => 'required|integer|exists:categories,id',
-            'locations.*.id' => 'required',
+            'locations' => 'required',
             'phones' => 'sometimes',
             'latitude' => 'sometimes',
             'longitude' => 'sometimes',

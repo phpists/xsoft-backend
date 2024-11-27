@@ -90,8 +90,14 @@ class User extends Authenticatable
 
     public function getUserBranch()
     {
-        return CompanyBranches::leftJoin('users_branches', 'users_branches.branch_id', 'companies_branches.id')
+        return CompanyBranches::select('companies_branches.*')
+            ->leftJoin('users_branches', 'users_branches.branch_id', 'companies_branches.id')
             ->where('users_branches.user_id', $this->id)
             ->get();
+    }
+
+    public function getFullName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }
