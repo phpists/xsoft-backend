@@ -13,13 +13,18 @@ class ResetPasswordLinkMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    use Queueable, SerializesModels;
-
     public $resetLink;
 
     public function __construct($resetLink)
     {
         $this->resetLink = $resetLink;
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'XSoft - посилання для скидання паролю',
+        );
     }
 
     public function build()
