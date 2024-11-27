@@ -11,6 +11,7 @@ use App\Mail\ResetPasswordKodMail;
 use App\Mail\ResetPasswordLinkMail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -32,9 +33,8 @@ class AuthController extends CoreController
                 Route::post('login', [static::class, 'login'])->name('login');
 
                 Route::post('forgot-password', [static::class, 'forgotPassword']);
-//                Route::post('forgot-password-verification-code', [static::class, 'forgotPasswordCheckKod']);
-//                Route::match(['get', 'post'], 'reset-password', [static::class, 'resetPassword'])->name('password.reset');
-//
+                Route::match(['get', 'post'], 'reset-password', [static::class, 'resetPassword'])->name('password.reset');
+
                 Route::group(
                     [
                         'middleware' => 'auth:api'
@@ -100,7 +100,7 @@ class AuthController extends CoreController
         };
 
         $user = Auth::getProvider()->retrieveByCredentials($credentials);
-        $token = $user->createToken('access_token')->accessToken;;
+        $token = $user->createToken('access_token')->accessToken;
 
         return $this->responseSuccess([
             'user' => new UserResource($user),
@@ -150,5 +150,39 @@ class AuthController extends CoreController
         return $this->responseSuccess([
             'message' => 'Посилання для скидання паролю надіслано на вашу електронну пошту.',
         ], 200);
+    }
+
+    /**
+     * Установка нового пароля
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetPassword(Request $request)
+    {
+        $input = $this->validateInput(
+            $request,
+            [
+                'email' => 'required|email',
+                'password' => 'required|min:8|confirmed',
+                'token' => 'required'
+            ]
+        );
+
+        $user = User::where('email', $input['email'])->first();
+        if ($user) {
+            $user->password = Hash::make($input['password']);
+            if ($user->update()) {
+                $token = $user->createToken('access_token')->accessToken;
+                return $this->responseSuccess([
+                    'user' => new UserResource($user),
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ], 200);
+            }
+        } else {
+            return $this->responseSuccess([
+                'message' => 'Такого користувача не існує',
+            ], 429);
+        }
     }
 }

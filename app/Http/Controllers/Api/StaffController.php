@@ -93,6 +93,7 @@ class StaffController extends CoreController
     {
         $data = $request->all();
         $auth = User::find(auth()->id());
+        $password = $data['password'];
         $staff = User::create([
             'parent_id' => $auth->id,
             'company_id' => $auth->getCurrentCompanyId(),
@@ -107,7 +108,7 @@ class StaffController extends CoreController
         ]);
 
         if ($staff) {
-            Mail::to($data['email'])->send(new StoreStaffMail($staff, $data['password']));
+            Mail::to($data['email'])->send(new StoreStaffMail($staff, $password));
 
             if ($request->hasFile('media')) {
                 foreach ($data['media'] as $media) {
