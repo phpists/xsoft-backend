@@ -39,7 +39,7 @@ class CompanyController extends CoreController
 
     public function getCompanies(Request $request)
     {
-        if (auth()->user()->isSuperAdmin()) {
+        if (auth()->user()->isSuperAdmin() || auth()->user()->isAdmin()) {
             $companies = Company::where('user_id', auth()->id())
                 ->get();
         } else {

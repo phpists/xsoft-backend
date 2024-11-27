@@ -89,6 +89,11 @@ class User extends Authenticatable
         return $this->role_id == User::SUPER_ADMIN ? true : false;
     }
 
+    public function isAdmin()
+    {
+        return $this->role_id == User::ADMIN ? true : false;
+    }
+
     public function getUserBranch()
     {
         return CompanyBranches::select('companies_branches.*')

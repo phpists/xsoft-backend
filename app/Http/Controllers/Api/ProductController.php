@@ -11,6 +11,7 @@ use App\Http\Requests\Product\SaveProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductsResource;
+use App\Http\Resources\Supplier\SuppliersCollectResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
 use App\Http\Services\FileService;
 use App\Models\Brand;
@@ -41,7 +42,7 @@ class ProductController extends CoreController
             ],
             function () {
                 Route::get('get-product', [static::class, 'getProduct']);
-                Route::get('get-products', [static::class, 'getProducts']);
+                Route::match(['get', 'post'], 'get-products', [static::class, 'getProducts']);
                 Route::post('add-product', [static::class, 'addProduct']);
                 Route::post('update-product', [static::class, 'updateProduct']);
                 Route::delete('delete-product', [static::class, 'deleteProduct']);
@@ -92,8 +93,13 @@ class ProductController extends CoreController
             $builder->where('category_id', $data['category_id']);
         }
 
-        Log::info('cat: ' . $data['categories']);
+        if (!empty($data['categories'])){
+            $builder->whereIn('category_id', $data['categories']);
+        }
 
+        if (!empty($data['measurements'])){
+            $builder->whereIn('product_measure_id', $data['measurements']);
+        }
 
         $products = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
 
@@ -230,6 +236,7 @@ class ProductController extends CoreController
             $taxes = Taxes::all();
             $warehouses = Warehouse::all();
             $vendors = Vendor::all();
+            $suppliers = User::where('role_id', User::SUPPLIERS)->get();
             $positions = Position::all();
             $departments = Department::all();
 
@@ -246,6 +253,7 @@ class ProductController extends CoreController
             'taxes' => $taxes,
             'warehouses' => $warehouses,
             'vendors' => $vendors,
+            'suppliers' => new SuppliersCollectResource($suppliers),
             'positions' => $positions,
             'departments' => $departments
         ]);
