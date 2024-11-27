@@ -19,6 +19,7 @@ class User extends Authenticatable
     const MANAGER = 5;
     const CUSTOMER = 2;
     const STAFF = 4;
+    const SUPPLIERS = 6;
 
     protected $fillable = [
         'parent_id',

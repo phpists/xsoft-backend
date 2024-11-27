@@ -27,6 +27,7 @@ use App\Models\Vendor;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class ProductController extends CoreController
@@ -81,9 +82,18 @@ class ProductController extends CoreController
             'id' => 'id',
         ]);
 
+        if (isset($data['q'])) {
+            $query = $data['q'];
+            $builder->where('title', 'like', "%$query%")
+                ->orWhere('article', 'like', "%$query%");
+        }
+
         if (isset($data['category_id'])) {
             $builder->where('category_id', $data['category_id']);
         }
+
+        Log::info('cat: ' . $data['categories']);
+
 
         $products = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
 
