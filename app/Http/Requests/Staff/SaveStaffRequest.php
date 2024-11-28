@@ -22,7 +22,9 @@ class SaveStaffRequest extends FormRequest
             'comment' => 'nullable|string',
             'password' => 'required',
             'phones' => 'sometimes',
-            'branches' => 'sometimes'
+            'branches' => 'sometimes',
+            'position_id' => 'sometimes',
+            'department_id' => 'sometimes'
         ];
     }
 }

@@ -94,16 +94,22 @@ class CompanyController extends CoreController
 
         if (count($data['locations'])) {
             foreach ($data['locations'] as $location) {
-                CompanyBranches::updateOrCreate([
-                    'id' => $location['id']
-                ], [
+                $params = [
                     'company_id' => $company->id,
                     'title' => $location['name'],
                     'location' => $location['title'],
                     'phones' => isset($location['phones']) ? json_encode($location['phones']) : null,
                     'latitude' => $location['latitude'],
                     'longitude' => $location['longitude'],
-                ]);
+                ];
+
+                if (empty($location['id'])) {
+                    CompanyBranches::create($params);
+                } else {
+                    CompanyBranches::updateOrCreate([
+                        'id' => $location['id']
+                    ], $params);
+                }
             }
         }
 
@@ -135,7 +141,7 @@ class CompanyController extends CoreController
         $data = $request->all();
         $user = User::find(auth()->id());
 
-        if (empty($user)){
+        if (empty($user)) {
             return $this->responseError('User not found');
         }
 

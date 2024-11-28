@@ -55,7 +55,8 @@ class StaffController extends CoreController
         $auth = User::find(auth()->id());
 
         $builder = User::query();
-        $builder->where('parent_id', $auth->id);
+        $builder->where('company_id', $auth->getCurrentCompanyId());
+        $builder->where('parent_id', auth()->id());
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -103,6 +104,8 @@ class StaffController extends CoreController
             'color' => $data['color'],
             'email' => $data['email'],
             'comment' => $data['comment'],
+            'position_id' => $data['position_id'],
+            'department_id' => $data['department_id'],
             'password' => Hash::make($data['password']),
             'phones' => json_encode($data['phones']),
         ]);
@@ -152,6 +155,8 @@ class StaffController extends CoreController
             'last_name' => $data['last_name'],
             'color' => $data['color'],
             'comment' => $data['comment'],
+            'position_id' => $data['position_id'],
+            'department_id' => $data['department_id'],
         ];
 
         if (isset($data['phones'])) {
@@ -177,6 +182,7 @@ class StaffController extends CoreController
         }
 
         if (isset($data['branches'])){
+            UserBranch::where('user_id', $auth->id)->delete();
             foreach ($data['branches'] as $branchId){
                 UserBranch::updateOrCreate([
                     'user_id' => $auth->id,

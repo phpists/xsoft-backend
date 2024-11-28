@@ -62,4 +62,9 @@ class FileService
 
         return $fileName;
     }
+
+    public static function a()
+    {
+        return 'some';
+    }
 }

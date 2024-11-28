@@ -8,6 +8,7 @@ use App\Http\Requests\Supplier\StoreSupplierRequest;
 use App\Http\Requests\Supplier\UpdateSupplierRequest;
 use App\Http\Resources\Supplier\SupplierResource;
 use App\Http\Resources\Supplier\SuppliersResource;
+use App\Http\Services\FileService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

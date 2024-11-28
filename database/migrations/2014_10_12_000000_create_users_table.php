@@ -27,6 +27,8 @@ return new class extends Migration {
             $table->date('bd_date')->nullable();
             $table->text('comment')->nullable();
             $table->json('tags')->nullable();
+            $table->bigInteger('position_id')->nullable()->comment('Посада');
+            $table->bigInteger('department_id')->nullable()->comment('Відділ');
             $table->rememberToken();
             $table->timestamps();
         });

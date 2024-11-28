@@ -35,7 +35,9 @@ class User extends Authenticatable
         'color',
         'bd_date',
         'comment',
-        'tags'
+        'tags',
+        'position_id',
+        'department_id'
     ];
 
     protected $hidden = [
@@ -92,6 +94,14 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role_id == User::ADMIN ? true : false;
+    }
+
+    public function getUserMainBranch()
+    {
+        return CompanyBranches::select('companies_branches.*')
+            ->leftJoin('users_branches', 'users_branches.branch_id', 'companies_branches.id')
+            ->where('users_branches.user_id', $this->id)
+            ->first();
     }
 
     public function getUserBranch()
