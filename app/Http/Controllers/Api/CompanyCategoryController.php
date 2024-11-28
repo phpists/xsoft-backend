@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductCategory\ProductCategoryCreateRequest;
 use App\Http\Requests\ProductCategory\ProductCategoryDeleteRequest;
 use App\Http\Requests\ProductCategory\ProductCategoryUpdateRequest;
+use App\Http\Resources\Category\CategoriesResource;
 use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\Traits\HasFullInfoFlag;
 use App\Models\Category;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
@@ -23,11 +25,21 @@ class CompanyCategoryController extends CoreController
                 'middleware' => 'auth:api'
             ],
             function () {
+                Route::get('get-categories', [static::class, 'getCategories']);
                 Route::post('add-category', [static::class, 'addCategory']);
                 Route::post('edit-category', [static::class, 'editCategory']);
                 Route::delete('delete-category', [static::class, 'deleteCategory']);
             }
         );
+    }
+
+    public function getCategories(Request $request)
+    {
+        $categories = Category::all();
+
+        return $this->responseSuccess([
+            'categories' => new CategoriesResource($categories)
+        ]);
     }
 
     public function addCategory(ProductCategoryCreateRequest $request)

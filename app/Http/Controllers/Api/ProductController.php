@@ -21,6 +21,7 @@ use App\Models\Measurement;
 use App\Models\Media;
 use App\Models\Position;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductItem;
 use App\Models\Taxes;
 use App\Models\User;
@@ -93,12 +94,24 @@ class ProductController extends CoreController
             $builder->where('category_id', $data['category_id']);
         }
 
-        if (!empty($data['categories'])){
+        if (!empty($data['categories'])) {
             $builder->whereIn('category_id', $data['categories']);
         }
 
-        if (!empty($data['measurements'])){
+        if (!empty($data['measurements'])) {
             $builder->whereIn('product_measure_id', $data['measurements']);
+        }
+
+        if (!empty($data['min_price'])) {
+            $builder->when($data['min_price'], function ($query, $minPrice) {
+                return $query->where('retail_price', '>=', $minPrice);
+            });
+        }
+
+        if (!empty($data['max_price'])) {
+            $builder->when($data['max_price'], function ($query, $maxPrice) {
+                return $query->where('retail_price', '<=', $maxPrice);
+            });
         }
 
         $products = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
@@ -231,7 +244,7 @@ class ProductController extends CoreController
             DB::beginTransaction();
 
             $brands = Brand::all();
-            $categories = Category::all();
+            $categories = ProductCategory::all();
             $measurements = Measurement::all();
             $taxes = Taxes::all();
             $warehouses = Warehouse::all();

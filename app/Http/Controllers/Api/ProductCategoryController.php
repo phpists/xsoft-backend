@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\ProductCategory\ProductCategoryCreateRequest;
 use App\Http\Requests\ProductCategory\ProductCategoryDeleteRequest;
 use App\Http\Requests\ProductCategory\ProductCategoryUpdateRequest;
+use App\Http\Resources\Category\CategoriesResource;
 use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
 use App\Models\ProductCategory;
