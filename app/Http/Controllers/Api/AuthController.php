@@ -6,6 +6,7 @@ use App\Exceptions\UnauthorizedException;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\ResetPasswordUserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Mail\ResetPasswordKodMail;
 use App\Mail\ResetPasswordLinkMail;
