@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPasswordUserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +16,6 @@ class ProfileController extends CoreController
         Route::group(
             [
                 'prefix' => 'profile',
-                'middleware' => 'auth:api'
             ],
             function () {
                 Route::post('update-user', [static::class, 'updateUser']);
@@ -35,18 +32,18 @@ class ProfileController extends CoreController
     public function updateUser(Request $request)
     {
         $data = $request->all();
-        $user = User::find(\auth()->id());
+        $user = User::where('id', $data['user_id'])->first();
 
         if (empty($user)) {
             return $this->responseError('Користувач не знайдений');
+        } else {
+            $user->update([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'phone' => $data['phone'],
+                'color' => $data['color']
+            ]);
         }
-
-        $user->update([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'phone' => $data['phone'],
-            'color' => $data['color']
-        ]);
 
         return $this->responseSuccess([
             'message' => 'Дані користувача успішно відредаговані',
@@ -62,7 +59,8 @@ class ProfileController extends CoreController
     public function updateUserPassword(ResetPasswordUserRequest $request)
     {
         $data = $request->all();
-        $user = User::find(\auth()->id());
+        $user = User::where('id', $data['user_id'])->first();
+
         if ($user) {
             $user->password = Hash::make($data['password']);
             if ($user->update()) {
