@@ -40,7 +40,7 @@ class ProfileController extends CoreController
             $user->update([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
-                'phone' => $data['phone'],
+                'phone' => $data['phones'],
                 'color' => $data['color']
             ]);
         }

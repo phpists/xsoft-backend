@@ -14,7 +14,8 @@ class ResetPasswordUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => 'required|min:4|confirmed',
+            'user_id' => 'sometimes',
+            'password' => 'required|string|min:1|confirmed',
         ];
     }
 }
