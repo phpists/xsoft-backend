@@ -16,10 +16,10 @@ class UpdateStaffRequest extends FormRequest
         return [
             'id' => 'required|integer|exists:users,id',
             'role_id' => 'required',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'sometimes',
+            'last_name' => 'sometimes',
             'color' => 'sometimes',
-            'email' => 'sometimes',
+            'email' => 'required|string|email|exists:users,email',
             'comment' => 'nullable|string',
             'password' => 'sometimes',
             'position_id' => 'sometimes',

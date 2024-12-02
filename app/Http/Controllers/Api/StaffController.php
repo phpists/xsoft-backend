@@ -118,11 +118,10 @@ class StaffController extends CoreController
     {
         $data = $request->all();
         $auth = User::find(auth()->id());
-        $password = $data['password'];
         $companyId = $auth->getCurrentCompanyId();
 
         // Створюємо нового працівника
-        $staff = $this->updateOrCreateStaff($auth, $data, $companyId, $password);
+        $staff = $this->updateOrCreateStaff($auth, $data, $companyId);
 
         // Прив'язка до компанії
         UserCompany::assignToCompany($staff->id, $companyId, UserCompany::DESIGNATED_COMPANY);
@@ -143,22 +142,24 @@ class StaffController extends CoreController
         ]);
     }
 
-    private function updateOrCreateStaff($auth, $data, $companyId, $password)
+    private function updateOrCreateStaff($auth, $data, $companyId)
     {
-        $user = User::updateOrCreate([
-            'email' => $data['email'],
-        ], [
+        $user = User::where('email', $data['email'])->first();
+
+        if (empty($user)) {
+            return null;
+        }
+
+        $user->update([
             'role_id' => $data['role_id'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'color' => $data['color'],
             'comment' => $data['comment'],
-            'position_id' => $data['position_id'],
+            'position_id' => isset($data['position_id']) ? $data['position_id'] : null,
             'department_id' => $data['department_id'],
             'phones' => json_encode($data['phones']),
         ]);
-
-        Log::info('User: ' . $data['email'] . ' Password: ' . $password);
 
         return $user;
     }
@@ -224,7 +225,7 @@ class StaffController extends CoreController
             'last_name' => $data['last_name'],
             'color' => $data['color'],
             'comment' => $data['comment'],
-            'position_id' => $data['position_id'],
+            'position_id' => isset($data['position_id']) ? $data['position_id'] : null,
             'department_id' => $data['department_id'],
         ];
 

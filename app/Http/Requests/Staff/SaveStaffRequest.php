@@ -15,12 +15,11 @@ class SaveStaffRequest extends FormRequest
     {
         return [
             'role_id' => 'required',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'sometimes',
+            'last_name' => 'sometimes',
             'color' => 'sometimes',
-            'email' => 'required|string|email',
+            'email' => 'required|string|email|exists:users,email',
             'comment' => 'nullable|string',
-            'password' => 'required',
             'phones' => 'sometimes',
             'branches' => 'sometimes',
             'position_id' => 'sometimes',
