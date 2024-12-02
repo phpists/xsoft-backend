@@ -70,6 +70,7 @@ class ClientController extends CoreController
     {
         $data = $request->all();
         $auth = User::find(auth()->id());
+        $rand = rand(100000, 9999999);
         $user = User::create([
             'company_id' => $auth->getCurrentCompanyId(),
             'parent_id' => auth()->id(),
@@ -77,14 +78,14 @@ class ClientController extends CoreController
             "category_id" => $data['category_id'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
-            'phone' => $data['phone'],
-            'color' => $data['color'],
-            'bd_date' => User::setUserBd($data),
-            'comment' => $data['comment'],
+            'phone' => isset($data['phone']) ? $data['phone'] : null,
+            'color' => isset($data['color']) ? $data['color'] : null,
+            'bd_date' => isset($params['bd_day']) ? User::setUserBd($data) : null,
+            'comment' => isset($data['comment']) ? $data['comment'] : null,
             'phones' => json_encode($data['phones']),
-            'tags' => json_encode($data['tags']),
-            'email' => $data['email'],
-            'password' => Hash::make(rand(1, 1000)),
+            'tags' => isset($data['tags']) ? json_encode($data['tags']) : null,
+            'email' => $rand . 'user@gmail.com',
+            'password' => Hash::make($rand),
         ]);
 
         if ($user) {
@@ -115,13 +116,12 @@ class ClientController extends CoreController
             "category_id" => $data['category_id'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
-            'phone' => $data['phone'],
-            'color' => $data['color'],
-            'bd_date' => User::setUserBd($data),
-            'comment' => $data['comment'],
+            'phone' => isset($data['phone']) ? $data['phone'] : null,
+            'color' => isset($data['color']) ? $data['color'] : null,
+            'bd_date' => isset($params['bd_day']) ? User::setUserBd($data) : null,
+            'comment' => isset($data['comment']) ? $data['comment'] : null,
             'phones' => json_encode($data['phones']),
             'tags' => json_encode($data['tags']),
-            'email' => $data['email'],
         ]);
 
         if ($user) {

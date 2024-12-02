@@ -13,6 +13,7 @@ use App\Http\Resources\User\UserResource;
 use App\Models\Company;
 use App\Models\CompanyBranches;
 use App\Models\User;
+use App\Models\UserCompany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Route;
@@ -39,13 +40,9 @@ class CompanyController extends CoreController
 
     public function getCompanies(Request $request)
     {
-        if (auth()->user()->isSuperAdmin() || auth()->user()->isAdmin()) {
-            $companies = Company::where('user_id', auth()->id())
-                ->get();
-        } else {
-            $companies = Company::where('id', auth()->user()->company_id)
-                ->get();
-        }
+        $companies = Company::leftJoin('users_companies', 'users_companies.company_id', 'companies.id')
+            ->where('users_companies.user_id', auth()->id())
+            ->get();
 
         return $this->responseSuccess(new CompaniesResource($companies));
     }
@@ -60,7 +57,11 @@ class CompanyController extends CoreController
             'color' => $data['color'],
         ]);
 
+
         if ($company) {
+            // Прив'язка до компанії
+            UserCompany::assignToCompany(auth()->id(), $company->id, UserCompany::MY_COMPANY);
+
             if (count($data['locations'])) {
                 foreach ($data['locations'] as $location) {
                     CompanyBranches::create([

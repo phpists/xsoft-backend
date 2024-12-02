@@ -18,14 +18,13 @@ class StoreUserRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string',
-            'color' => 'required|string',
-            'bd_day' => 'required|date|before:today',
-            'email' => 'required|string|email|unique:users,email',
-            'comment' => 'nullable|string',
-            'phones' => 'required',
-            'phones.*' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string|max:500'
+            'color' => 'sometimes|string',
+            'bd_day' => 'sometimes|date|before:today',
+            'email' => 'sometimes|string|email|unique:users,email',
+            'comment' => 'sometimes|string',
+            'phones' => 'sometimes',
+            'phones.*' => 'sometimes',
+            'tags' => 'sometimes',
         ];
     }
 

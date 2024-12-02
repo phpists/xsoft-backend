@@ -17,6 +17,7 @@ class CompanyResource extends JsonResource
             'user_id' => $this->user_id,
             'color' => $this->color,
             'category_id' => $this->category_id,
+            'type_id' => $this->type_id,
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
             'branches' => new CompanyBranchesResource($this->branches),
         ];

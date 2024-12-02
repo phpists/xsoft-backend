@@ -17,6 +17,7 @@ use App\Models\Media;
 use App\Models\Position;
 use App\Models\User;
 use App\Models\UserBranch;
+use App\Models\UserCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -57,6 +58,8 @@ class StaffController extends CoreController
         $builder = User::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
         $builder->where('parent_id', auth()->id());
+        $builder->whereIn('role_id', [User::MANAGER, User::STAFF, User::ADMIN]);
+
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -95,45 +98,25 @@ class StaffController extends CoreController
         $data = $request->all();
         $auth = User::find(auth()->id());
         $password = $data['password'];
-        $staff = User::create([
-            'parent_id' => $auth->id,
-            'company_id' => $auth->getCurrentCompanyId(),
-            'role_id' => $data['role_id'],
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'color' => $data['color'],
-            'email' => $data['email'],
-            'comment' => $data['comment'],
-            'position_id' => $data['position_id'],
-            'department_id' => $data['department_id'],
-            'password' => Hash::make($data['password']),
-            'phones' => json_encode($data['phones']),
-        ]);
+        $companyId = $auth->getCurrentCompanyId();
 
-        if ($staff) {
-            Mail::to($data['email'])->send(new StoreStaffMail($staff, $password));
+        // Створюємо нового працівника
+        $staff = $this->createStaff($auth, $data, $companyId, $password);
 
-            if ($request->hasFile('media')) {
-                foreach ($data['media'] as $media) {
-                    Media::create([
-                        'type_id' => Media::STAFF_MEDIA,
-                        'parent_id' => $staff->id,
-                        'file' => FileService::saveFile('uploads', "media", $media),
-                    ]);
-                }
-            }
+        // Відправляємо електронний лист
+        $this->sendWelcomeEmail($staff, $password);
+
+        // Прив'язка до компанії
+        UserCompany::assignToCompany($staff->id, $companyId, UserCompany::DESIGNATED_COMPANY);
+
+        // Додаємо медіафайли
+        if ($request->hasFile('media')) {
+            $this->handleMedia($staff, $data['media']);
         }
 
-        if (isset($data['branches'])){
-            foreach ($data['branches'] as $branchId){
-                UserBranch::updateOrCreate([
-                    'user_id' => $staff->id,
-                    'branch_id' => $branchId
-                ], [
-                    'user_id' => $staff->id,
-                    'branch_id' => $branchId
-                ]);
-            }
+        // Прив'язка до відділень
+        if (isset($data['branches'])) {
+            $this->assignToBranches($staff, $data['branches']);
         }
 
         return $this->responseSuccess([
@@ -142,12 +125,85 @@ class StaffController extends CoreController
         ]);
     }
 
+    private function createStaff($auth, $data, $companyId, $password)
+    {
+        return User::create([
+            'parent_id' => $auth->id,
+            'company_id' => $companyId,
+            'role_id' => $data['role_id'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'color' => $data['color'],
+            'email' => $data['email'],
+            'comment' => $data['comment'],
+            'position_id' => $data['position_id'],
+            'department_id' => $data['department_id'],
+            'password' => Hash::make($password),
+            'phones' => json_encode($data['phones']),
+        ]);
+    }
+
+    private function sendWelcomeEmail($staff, $password)
+    {
+        Mail::to($staff->email)->send(new StoreStaffMail($staff, $password));
+    }
+
+
+    private function handleMedia($staff, $mediaFiles)
+    {
+        foreach ($mediaFiles as $media) {
+            Media::create([
+                'type_id' => Media::STAFF_MEDIA,
+                'parent_id' => $staff->id,
+                'file' => FileService::saveFile('uploads', "media", $media),
+            ]);
+        }
+    }
+
+    private function assignToBranches($staff, $branches)
+    {
+        foreach ($branches as $branchId) {
+            UserBranch::updateOrCreate(
+                [
+                    'user_id' => $staff->id,
+                    'branch_id' => $branchId,
+                ],
+                [
+                    'user_id' => $staff->id,
+                    'branch_id' => $branchId,
+                ]
+            );
+        }
+    }
+
+
     public function editStaff(UpdateStaffRequest $request)
     {
         $data = $request->all();
         $auth = User::find(auth()->id());
         $staff = User::find($data['id']);
 
+        // Оновлення даних працівника
+        $this->updateStaffDetails($staff, $auth, $data);
+
+        // Додавання медіафайлів
+        if ($request->hasFile('media')) {
+            $this->handleMedia($staff, $data['media']);
+        }
+
+        // Оновлення прив'язки до відділень
+        if (isset($data['branches'])) {
+            $this->updateBranches($auth, $data['branches']);
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Працівник успішно відредагований',
+            'staff' => new StaffResource($staff),
+        ]);
+    }
+
+    private function updateStaffDetails($staff, $auth, $data)
+    {
         $params = [
             'company_id' => $auth->getCurrentCompanyId(),
             'role_id' => $data['role_id'],
@@ -168,36 +224,25 @@ class StaffController extends CoreController
         }
 
         $staff->update($params);
+    }
 
-        if ($staff) {
-            if ($request->hasFile('media')) {
-                foreach ($data['media'] as $media) {
-                    Media::create([
-                        'type_id' => Media::STAFF_MEDIA,
-                        'parent_id' => $staff->id,
-                        'file' => FileService::saveFile('uploads', "media", $media),
-                    ]);
-                }
-            }
-        }
 
-        if (isset($data['branches'])){
-            UserBranch::where('user_id', $auth->id)->delete();
-            foreach ($data['branches'] as $branchId){
-                UserBranch::updateOrCreate([
+    private function updateBranches($auth, $branches)
+    {
+        UserBranch::where('user_id', $auth->id)->delete();
+
+        foreach ($branches as $branchId) {
+            UserBranch::updateOrCreate(
+                [
                     'user_id' => $auth->id,
-                    'branch_id' => $branchId
-                ], [
+                    'branch_id' => $branchId,
+                ],
+                [
                     'user_id' => $auth->id,
-                    'branch_id' => $branchId
-                ]);
-            }
+                    'branch_id' => $branchId,
+                ]
+            );
         }
-
-        return $this->responseSuccess([
-            'message' => 'Працівник успішно відредагований',
-            'staff' => new StaffResource($staff),
-        ]);
     }
 
     public function deleteStaff(DeleteStaffRequest $request)
