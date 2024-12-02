@@ -40,7 +40,8 @@ class CompanyController extends CoreController
 
     public function getCompanies(Request $request)
     {
-        $companies = Company::leftJoin('users_companies', 'users_companies.company_id', 'companies.id')
+        $companies = Company::select('companies.*', 'users_companies.type_id')
+            ->leftJoin('users_companies', 'users_companies.company_id', 'companies.id')
             ->where('users_companies.user_id', auth()->id())
             ->get();
 

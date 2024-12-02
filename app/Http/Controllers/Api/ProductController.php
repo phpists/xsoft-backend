@@ -79,7 +79,6 @@ class ProductController extends CoreController
 
         $builder = Product::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->where('user_id', auth()->id());
         $this->setSorting($builder, [
             'id' => 'id',
         ]);

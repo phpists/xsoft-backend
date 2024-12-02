@@ -9,6 +9,7 @@ use App\Http\Requests\Staff\SaveStaffMediaRequest;
 use App\Http\Requests\Staff\SaveStaffRequest;
 use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Http\Resources\Staff\StaffAllResource;
+use App\Http\Resources\Staff\StaffCollectResource;
 use App\Http\Resources\Staff\StaffResource;
 use App\Http\Services\FileService;
 use App\Mail\StoreStaffMail;
@@ -21,6 +22,7 @@ use App\Models\UserCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -35,6 +37,7 @@ class StaffController extends CoreController
                 'middleware' => 'auth:api'
             ],
             function () {
+                Route::get('search-staff', [static::class, 'searchStaff']);
                 Route::get('get-all-staff', [static::class, 'getAllStaff']);
                 Route::get('get-staff', [static::class, 'getStaff']);
                 Route::post('add-staff', [static::class, 'addStaff']);
@@ -50,6 +53,23 @@ class StaffController extends CoreController
         );
     }
 
+    public function searchStaff(Request $request)
+    {
+        $data = $request->all();
+
+        $builder = User::query();
+        if (isset($data['q'])) {
+            $query = $data['q'];
+            $builder->where('email', 'like', "%$query%");
+        }
+
+        $staff = $builder->get();
+
+        return $this->responseSuccess([
+            'staff' => new StaffCollectResource($staff)
+        ]);
+    }
+
     public function getAllStaff(Request $request)
     {
         $data = $request->all();
@@ -57,7 +77,6 @@ class StaffController extends CoreController
 
         $builder = User::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->where('parent_id', auth()->id());
         $builder->whereIn('role_id', [User::MANAGER, User::STAFF, User::ADMIN]);
 
 
@@ -127,7 +146,9 @@ class StaffController extends CoreController
 
     private function createStaff($auth, $data, $companyId, $password)
     {
-        return User::create([
+        $user = User::updateOrCreate([
+            'email' => $data['email'],
+        ], [
             'parent_id' => $auth->id,
             'company_id' => $companyId,
             'role_id' => $data['role_id'],
@@ -141,6 +162,10 @@ class StaffController extends CoreController
             'password' => Hash::make($password),
             'phones' => json_encode($data['phones']),
         ]);
+
+        Log::info('User: ' . $data['email'] . ' Password: ' . $password);
+
+        return $user;
     }
 
     private function sendWelcomeEmail($staff, $password)
@@ -249,9 +274,11 @@ class StaffController extends CoreController
     {
         $data = $request->all();
         $auth = User::find(auth()->id());
-        User::where('company_id', $auth->getCurrentCompanyId())
-            ->whereIn('id', $data['idx'])
-            ->delete();
+
+        User::whereIn('id', $data['idx'])
+            ->update([
+                'parent_id' => null
+            ]);
 
         return $this->responseSuccess([
             'message' => 'Працівник успішно видалені',

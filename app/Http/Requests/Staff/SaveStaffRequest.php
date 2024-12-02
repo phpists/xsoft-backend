@@ -18,7 +18,7 @@ class SaveStaffRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'color' => 'sometimes',
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'required|string|email',
             'comment' => 'nullable|string',
             'password' => 'required',
             'phones' => 'sometimes',

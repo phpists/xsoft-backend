@@ -25,7 +25,6 @@ class StaffResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'phones' => json_decode($this->phones),
-            'position_id' => $this->position_id,
             'department_id' => $this->department_id,
             'media' => isset($this->staffMedia) ? new MediasResource($this->staffMedia) : null,
             'branches' => isset($this->userBranch) ? new CompanyBranchesResource($this->getUserBranch()) : null

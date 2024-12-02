@@ -28,7 +28,7 @@ class UserCompany extends Model
      * @param $companyId
      * @param $type
      */
-    private static function assignToCompany($userId, $companyId, $type)
+    public static function assignToCompany($userId, $companyId, $type)
     {
         UserCompany::updateOrCreate(
             [
