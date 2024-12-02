@@ -58,10 +58,9 @@ class CompanyController extends CoreController
             'color' => $data['color'],
         ]);
 
-
         if ($company) {
             // Прив'язка до компанії
-            UserCompany::assignToCompany(auth()->id(), $company->id, UserCompany::MY_COMPANY);
+            UserCompany::assignToCompany(auth()->id(), $company->id, UserCompany::MY_COMPANY, true);
 
             if (count($data['locations'])) {
                 foreach ($data['locations'] as $location) {

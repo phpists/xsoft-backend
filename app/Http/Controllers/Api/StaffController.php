@@ -78,9 +78,11 @@ class StaffController extends CoreController
         $auth = User::find(auth()->id());
 
         $builder = User::query();
-        $builder->where('company_id', $auth->getCurrentCompanyId());
+        $builder->whereHas('userCompanies', function ($query) use ($auth) {
+            return $query->where('company_id', $auth->getCurrentCompanyId())
+                ->where('is_parent', false);
+        });
         $builder->whereIn('role_id', [User::MANAGER, User::STAFF, User::ADMIN]);
-
 
         if (isset($data['q'])) {
             $query = $data['q'];
@@ -178,16 +180,18 @@ class StaffController extends CoreController
     private function assignToBranches($staff, $branches)
     {
         foreach ($branches as $branchId) {
-            UserBranch::updateOrCreate(
-                [
-                    'user_id' => $staff->id,
-                    'branch_id' => $branchId,
-                ],
-                [
-                    'user_id' => $staff->id,
-                    'branch_id' => $branchId,
-                ]
-            );
+            if ($branchId) {
+                UserBranch::updateOrCreate(
+                    [
+                        'user_id' => $staff->id,
+                        'branch_id' => $branchId,
+                    ],
+                    [
+                        'user_id' => $staff->id,
+                        'branch_id' => $branchId,
+                    ]
+                );
+            }
         }
     }
 

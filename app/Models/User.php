@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasMany(UserBranch::class, 'user_id', 'id');
     }
 
+    public function userCompanies()
+    {
+        return $this->hasMany(UserCompany::class, 'user_id', 'id');
+    }
+
     public static function setUserBd($params)
     {
         if ($params['bd_day']) {

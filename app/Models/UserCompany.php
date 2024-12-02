@@ -19,7 +19,8 @@ class UserCompany extends Model
     protected $fillable = [
         'user_id',
         'company_id',
-        'type_id'
+        'type_id',
+        'is_parent',
     ];
 
     /**
@@ -27,8 +28,9 @@ class UserCompany extends Model
      * @param $userId
      * @param $companyId
      * @param $type
+     * @param $isParent
      */
-    public static function assignToCompany($userId, $companyId, $type)
+    public static function assignToCompany($userId, $companyId, $type, $isParent = false)
     {
         UserCompany::updateOrCreate(
             [
@@ -39,6 +41,7 @@ class UserCompany extends Model
                 'user_id' => $userId,
                 'company_id' => $companyId,
                 'type_id' => $type,
+                'is_parent' => $isParent
             ]
         );
     }
