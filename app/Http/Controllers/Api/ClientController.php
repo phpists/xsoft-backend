@@ -48,7 +48,6 @@ class ClientController extends CoreController
 
         $builder = User::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
-        $builder->where('parent_id', auth()->id());
         $builder->where('role_id', User::CUSTOMER);
 
         if (isset($data['q'])) {
