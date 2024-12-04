@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 \App\Http\Controllers\Api\BrandController::routers();
 \App\Http\Controllers\Api\SupplierController::routers();
 \App\Http\Controllers\Api\ProfileController::routers();
+\App\Http\Controllers\Api\WarehouseController::routers();
 
 
 

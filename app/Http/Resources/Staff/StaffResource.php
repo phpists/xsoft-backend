@@ -24,6 +24,7 @@ class StaffResource extends JsonResource
             'comment' => $this->comment,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'phone' => $this->phone,
             'phones' => json_decode($this->phones),
             'department_id' => $this->department_id,
             'media' => isset($this->staffMedia) ? new MediasResource($this->staffMedia) : null,
