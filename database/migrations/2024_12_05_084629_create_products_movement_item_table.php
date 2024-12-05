@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('measurement_id')->comment('Одиниці виміру');
             $table->float('cost_price')->nullable()->comment('Ціна закупки');
             $table->float('retail_price')->nullable()->comment('Роздрібна ціна');
+            $table->text('description')->nullable()->comment('Опис');
             $table->timestamps();
         });
     }

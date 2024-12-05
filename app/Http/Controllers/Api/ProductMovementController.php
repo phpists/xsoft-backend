@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductMovement\AddProductMovementSaleRequest;
 use App\Http\Requests\ProductMovement\SaveProductMovementRequest;
 use App\Http\Resources\ProductsMovement\ProductsMovementResource;
+use App\Http\Resources\ProductsMovement\ProductsMovementsItemResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
@@ -30,7 +32,9 @@ class ProductMovementController extends CoreController
             function () {
                 Route::get('get-product-movement-info', [static::class, 'getProductMovementInfo']);
                 Route::get('get-products-movement', [static::class, 'getProductsMovement']);
+                Route::get('search-products-movement', [static::class, 'searchProductsMovement']);
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
+                Route::post('add-product-movement-sale', [static::class, 'addProductMovementSale']);
             }
         );
     }
@@ -90,6 +94,11 @@ class ProductMovementController extends CoreController
         ]);
     }
 
+    /**
+     * Прихід товару
+     * @param SaveProductMovementRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addProductMovement(SaveProductMovementRequest $request)
     {
         $data = $request->all();
@@ -127,6 +136,62 @@ class ProductMovementController extends CoreController
         return $this->responseSuccess([
             'message' => 'Прихід успішно збережений',
             'product_movement' => new ProductsMovementResource($productMovement)
+        ]);
+    }
+
+    /**
+     * Пошук ProductsMovementItem
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchProductsMovement(Request $request)
+    {
+        $data = $request->all();
+        $builder = ProductsMovementItem::query();
+        $builder->whereHas('product', function ($query) use ($data) {
+            $q = $data['q'];
+            return $query->where('title', 'LIKE', "%$q%")
+                ->orWhere('article', 'LIKE', "%$q%");
+        });
+
+        $item = $builder->first();
+
+        if (empty($item)) {
+            return $this->responseSuccess([
+                'product_movement_item' => []
+            ]);
+        }
+
+        return $this->responseSuccess([
+            'product_movement_item' => new ProductsMovementsItemResource($item)
+        ]);
+    }
+
+    /**
+     * Продажу товарів
+     */
+    public function addProductMovementSale(AddProductMovementSaleRequest $request)
+    {
+        $data = $request->all();
+
+        /**
+         * Змінити валідацію 'qty'
+         */
+
+        $productsMovementItem = ProductsMovementItem::create([
+            'product_movement_id' => $data['product_movement_id'],
+            'product_id' => $data['product_id'],
+            'type_id' => $data['type_id'],
+            'qty' => $data['qty'],
+            'measurement_id' => $data['measurement_id'],
+            'cost_price' => $data['cost_price'],
+            'retail_price' => $data['retail_price'],
+            'description' => $data['description']
+        ]);
+
+        return $this->responseSuccess([
+            'message' => 'Дані успішно збережено',
+            'product_movement_item' => new ProductsMovementsItemResource($productsMovementItem)
         ]);
     }
 }

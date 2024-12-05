@@ -17,6 +17,12 @@ class ProductsMovementItem extends Model
         'qty',
         'measurement_id',
         'cost_price',
-        'retail_price'
+        'retail_price',
+        'description',
     ];
+
+    public function product()
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
 }

@@ -28,7 +28,6 @@ class ProductResource extends JsonResource
             'materials_used_quantity' => $this->materials_used_quantity,
             'materials_used_measure_id' => $this->materials_used_measure_id,
             'created_at' => date('Y-d-m H:i:s', strtotime($this->created_at)),
-            'items' => new ProductItemsResource($this->productItem),
             'media' => new MediasResource($this->media),
             'tags' => json_decode($this->tags),
             'vendors' => json_decode($this->vendors),

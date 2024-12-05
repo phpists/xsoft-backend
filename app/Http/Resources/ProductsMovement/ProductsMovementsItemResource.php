@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\ProductsMovement;
 
+use App\Http\Resources\Product\ProductResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,7 +20,10 @@ class ProductsMovementsItemResource extends JsonResource
             'measurement_id' => $this->measurement_id,
             'cost_price' => $this->cost_price,
             'retail_price' => $this->retail_price,
-            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s')
+            'description' => $this->description,
+            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
+
+            'product' => new ProductResource($this->product)
         ];
 
         return $return;
