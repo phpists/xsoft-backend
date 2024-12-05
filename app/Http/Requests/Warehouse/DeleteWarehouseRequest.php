@@ -4,7 +4,7 @@ namespace App\Http\Requests\Warehouse;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetWarehouseRequest extends FormRequest
+class DeleteWarehouseRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class GetWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|integer|exists:warehouses,id',
+            'idx.*' => 'required|integer|exists:warehouses,id',
         ];
     }
 }

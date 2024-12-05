@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Warehouse\DeleteWarehouseRequest;
 use App\Http\Requests\Warehouse\GetWarehouseRequest;
 use App\Http\Requests\Warehouse\SaveWarehouseRequest;
 use App\Http\Requests\Warehouse\UpdateWarehouseRequest;
@@ -37,8 +38,21 @@ class WarehouseController extends CoreController
 
     public function getWarehouses(Request $request)
     {
+        $data = $request->all();
         $auth = User::find(auth()->id());
-        $warehouses = Warehouse::where('company_id', $auth->getCurrentCompanyId())->get();
+        $builder = Warehouse::query();
+        $builder->where('company_id', $auth->getCurrentCompanyId());
+
+        if (isset($data['q'])) {
+            $query = $data['q'];
+            $builder->where('title', 'like', "%$query%");
+        }
+
+        $this->setSorting($builder, [
+            'id' => 'id',
+        ]);
+
+        $warehouses = $builder->get();
 
         return $this->responseSuccess([
             'warehouses' => new WarehousesResource($warehouses)
@@ -88,7 +102,7 @@ class WarehouseController extends CoreController
         ]);
     }
 
-    public function deleteWarehouse(GetWarehouseRequest $request)
+    public function deleteWarehouse(DeleteWarehouseRequest $request)
     {
         $data = $request->all();
         Warehouse::whereIn('id', $data['idx'])->delete();
