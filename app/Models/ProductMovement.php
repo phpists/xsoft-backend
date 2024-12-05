@@ -10,6 +10,10 @@ class ProductMovement extends Model
     use HasFactory;
 
     /**
+     * Обіг товарів
+     */
+
+    /**
      * Type
      */
     const PARISH = 1; // Прихід
@@ -18,6 +22,7 @@ class ProductMovement extends Model
 
     protected $table = 'products_movement';
     protected $fillable = [
+        'company_id',
         'staff_id',
         'warehouse_id',
         'supplier_id',

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('products_movement', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('staff_id')->comment('Прийняв');
+            $table->bigInteger('company_id')->comment('Id компанії');
+            $table->bigInteger('staff_id')->comment('Особа яка прийняла');
             $table->bigInteger('warehouse_id')->comment('Склад товарів');
             $table->bigInteger('supplier_id')->comment('Постачальник');
             $table->bigInteger('box_office_id')->nullable()->comment('Каса');

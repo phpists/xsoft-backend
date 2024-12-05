@@ -12,6 +12,7 @@ class ProductsMovementResource extends JsonResource
     {
         $return = [
             'id' => $this->id,
+            'company_id' => $this->company_id,
             'staff_id' => $this->staff_id,
             'warehouse_id' => $this->warehouse_id,
             'supplier_id' => $this->supplier_id,

@@ -70,9 +70,10 @@ class ProductMovementController extends CoreController
     public function addProductMovement(SaveProductMovementRequest $request)
     {
         $data = $request->all();
-
+        $auth = User::find(auth()->id());
         $productMovement = ProductMovement::create([
             'staff_id' => $data['staff_id'],
+            'company_id' => $auth->getCurrentCompanyId(),
             'warehouse_id' => $data['warehouse_id'],
             'supplier_id' => $data['supplier_id'],
             'type_id' => ProductMovement::PARISH,
