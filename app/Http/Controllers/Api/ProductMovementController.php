@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductMovement\SaveProductMovementRequest;
 use App\Http\Resources\ProductsMovement\ProductsMovementResource;
+use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
+use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
 use App\Models\Measurement;
 use App\Models\ProductMovement;
@@ -12,6 +14,7 @@ use App\Models\ProductsMovementItem;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +29,7 @@ class ProductMovementController extends CoreController
             ],
             function () {
                 Route::get('get-product-movement-info', [static::class, 'getProductMovementInfo']);
+                Route::get('get-products-movement', [static::class, 'getProductsMovement']);
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
             }
         );
@@ -64,6 +68,25 @@ class ProductMovementController extends CoreController
             'warehouses' => $warehouses,
             'measurements' => $measurements,
             'suppliers' => new SuppliersCollectResource($suppliers),
+        ]);
+    }
+
+    public function getProductsMovement(Request $request)
+    {
+        $data = $request->all();
+        $auth = User::find(auth()->id());
+
+        $builder = ProductMovement::query();
+        $builder->where('company_id', $auth->getCurrentCompanyId());
+
+        $this->setSorting($builder, [
+            'id' => 'id',
+        ]);
+
+        $productMovements = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
+
+        return $this->responseSuccess([
+            'products_movement' => new ProductsMovementsResource($productMovements)
         ]);
     }
 

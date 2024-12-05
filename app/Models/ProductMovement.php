@@ -36,6 +36,24 @@ class ProductMovement extends Model
         'box_office_date'
     ];
 
+    public function getTypeTitle()
+    {
+        $title = '';
+        switch ($this->type_id) {
+            case self::PARISH;
+                $title = 'Прихід';
+                break;
+            case self::SALE;
+                $title = 'Продаж';
+                break;
+            case self::WRITE_DOWN;
+                $title = 'Списання';
+                break;
+        }
+
+        return $title;
+    }
+
     public function items()
     {
         return $this->hasMany(ProductsMovementItem::class, 'product_movement_id', 'id');

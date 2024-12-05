@@ -17,6 +17,7 @@ class ProductsMovementResource extends JsonResource
             'warehouse_id' => $this->warehouse_id,
             'supplier_id' => $this->supplier_id,
             'type_id' => $this->type_id,
+            'type_title' => $this->getTypeTitle(),
             'date_create' => $this->date_create,
             'time_create' => $this->time_create,
             'debt' => $this->debt,
