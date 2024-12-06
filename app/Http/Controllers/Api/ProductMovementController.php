@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductMovement\AddProductMovementSaleRequest;
+use App\Http\Requests\ProductMovement\GetProductMovementItemRequest;
+use App\Http\Requests\ProductMovement\GetProductMovementRequest;
 use App\Http\Requests\ProductMovement\SaveProductMovementRequest;
 use App\Http\Resources\ProductsMovement\ProductsMovementResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemResource;
@@ -32,6 +34,8 @@ class ProductMovementController extends CoreController
             function () {
                 Route::get('get-product-movement-info', [static::class, 'getProductMovementInfo']);
                 Route::get('get-products-movement', [static::class, 'getProductsMovement']);
+                Route::get('get-product-movement', [static::class, 'getProductMovement']);
+                Route::get('get-product-movement-item', [static::class, 'getProductMovementItem']);
                 Route::get('search-products-movement', [static::class, 'searchProductsMovement']);
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
                 Route::post('add-product-movement-sale', [static::class, 'addProductMovementSale']);
@@ -91,6 +95,34 @@ class ProductMovementController extends CoreController
 
         return $this->responseSuccess([
             'products_movement' => new ProductsMovementsResource($productMovements)
+        ]);
+    }
+
+    public function getProductMovement(GetProductMovementRequest $request)
+    {
+        $data = $request->all();
+        $productMovement = ProductMovement::where('id', $data['product_movement_id'])->first();
+
+        if (empty($productMovement)) {
+            return $this->responseError('Прихід товару не знайдений');
+        }
+
+        return $this->responseSuccess([
+            'product_movement' => new ProductMovement($productMovement)
+        ]);
+    }
+
+    public function getProductMovementItem(GetProductMovementItemRequest $request)
+    {
+        $data = $request->all();
+        $productMovementItem = ProductsMovementItem::where('id', $data['product_movement_item_id'])->first();
+
+        if (empty($productMovementItem)) {
+            return $this->responseError('Одиниця прихід товару не знайдена');
+        }
+
+        return $this->responseSuccess([
+            'item' => new ProductsMovementsItemResource($productMovementItem)
         ]);
     }
 
