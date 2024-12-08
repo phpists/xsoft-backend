@@ -278,6 +278,22 @@ class ProductMovementController extends CoreController
             'description' => $data['description']
         ]);
 
+        if ($productsMovementItem){
+            /**
+             * Списати одиницю
+             */
+            $productMovement = ProductsMovementItem::where('product_movement_id', request()->get('product_movement_id'))
+                ->where('product_id', request()->get('product_id'))
+                ->where('type_id', ProductMovement::PARISH)
+                ->first();
+
+            if ($productMovement) {
+                $productMovement->update([
+                    'qty' => $productMovement->qty - $data['qty'],
+                ]);
+            }
+        }
+
         return $this->responseSuccess([
             'message' => 'Дані успішно збережено',
             'product_movement_item' => new ProductsMovementsItemResource($productsMovementItem)
