@@ -7,16 +7,20 @@ use App\Http\Requests\ProductMovement\AddProductMovementSaleRequest;
 use App\Http\Requests\ProductMovement\GetProductMovementItemRequest;
 use App\Http\Requests\ProductMovement\GetProductMovementRequest;
 use App\Http\Requests\ProductMovement\SaveProductMovementRequest;
+use App\Http\Requests\ProductMovement\UpdateProductMovementRequest;
+use App\Http\Resources\Product\ProductMovementResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
 use App\Models\Measurement;
+use App\Models\Product;
 use App\Models\ProductMovement;
 use App\Models\ProductsMovementItem;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
@@ -37,8 +41,13 @@ class ProductMovementController extends CoreController
                 Route::get('get-product-movement', [static::class, 'getProductMovement']);
                 Route::get('get-product-movement-item', [static::class, 'getProductMovementItem']);
                 Route::get('search-products-movement', [static::class, 'searchProductsMovement']);
+
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
+                Route::post('update-product-movement', [static::class, 'updateProductMovement']);
+
                 Route::post('add-product-movement-sale', [static::class, 'addProductMovementSale']);
+
+                Route::get('get-product-by-id', [static::class, 'getProductById']);
             }
         );
     }
@@ -51,19 +60,19 @@ class ProductMovementController extends CoreController
             $auth = User::find(auth()->id());
             $company_id = $auth->getCurrentCompanyId();
 
-            $builder = User::query();
-            $builder->whereHas('userCompanies', function ($query) use ($auth, $company_id) {
-                return $query->where('company_id', $company_id);
-            });
-            $builder->whereIn('role_id', [User::MANAGER, User::STAFF, User::ADMIN]);
+            $staffs = User::with('userCompanies')
+                ->whereIn('role_id', [User::MANAGER, User::STAFF, User::ADMIN])
+                ->whereHas('userCompanies', function ($query) use ($company_id) {
+                    $query->where('company_id', $company_id);
+                })->get();
 
-            $staffs = $builder->get();
-            $warehouses = Warehouse::all();
-            $measurements = Measurement::all();
+            $warehouses = Warehouse::where('company_id', $company_id)->get();
+
             $suppliers = User::where('role_id', User::SUPPLIERS)
                 ->where('company_id', $company_id)
                 ->get();
 
+            $measurements = Measurement::all();
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -172,6 +181,54 @@ class ProductMovementController extends CoreController
     }
 
     /**
+     * Редагування приходу товарів
+     * @param UpdateProductMovementRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProductMovement(UpdateProductMovementRequest $request)
+    {
+        $data = $request->all();
+        $auth = User::find(auth()->id());
+        $productMovement = ProductMovement::find($data['id']);
+        $productMovement->update([
+            'staff_id' => $data['staff_id'],
+            'company_id' => $auth->getCurrentCompanyId(),
+            'warehouse_id' => $data['warehouse_id'],
+            'supplier_id' => $data['supplier_id'],
+            'type_id' => ProductMovement::PARISH,
+            'total_price' => $data['total_price'],
+            'date_create' => $data['date_create'],
+            'time_create' => $data['time_create'],
+            'debt' => isset($data['debt']) ? $data['debt'] : null,
+            'installment_payment' => isset($data['installment_payment']) ? $data['installment_payment'] : null,
+            'box_office_date' => $data['box_office_date']
+        ]);
+
+
+        if (isset($data['items'])) {
+            foreach ($data['items'] as $item) {
+                ProductsMovementItem::updateOrCreate([
+                    'product_movement_id' => $productMovement->id,
+                    'product_id' => $item['product_id'],
+                ], [
+                    'product_movement_id' => $productMovement->id,
+                    'product_id' => $item['product_id'],
+                    'type_id' => ProductMovement::PARISH,
+                    'qty' => $item['qty'],
+                    'measurement_id' => $item['measurement_id'],
+                    'cost_price' => $item['cost_price'],
+                    'retail_price' => $item['retail_price']
+                ]);
+            }
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Прихід успішно відредагований!',
+            'product_movement' => new ProductsMovementResource($productMovement)
+        ]);
+    }
+
+    /**
      * Пошук ProductsMovementItem
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -224,6 +281,23 @@ class ProductMovementController extends CoreController
         return $this->responseSuccess([
             'message' => 'Дані успішно збережено',
             'product_movement_item' => new ProductsMovementsItemResource($productsMovementItem)
+        ]);
+    }
+
+    public function getProductById(Request $request)
+    {
+        $data = $request->all();
+        $auth = User::find(auth()->id());
+        $product = Product::where('id', $data['id'])
+            ->where('company_id', $auth->getCurrentCompanyId())
+            ->first();
+
+        if (empty($product)) {
+            return $this->responseError('Товар не знайдений');
+        }
+
+        return $this->responseSuccess([
+            'product' => new ProductMovementResource($product)
         ]);
     }
 }

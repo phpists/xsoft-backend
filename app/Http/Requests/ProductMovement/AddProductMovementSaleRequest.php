@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ProductMovement;
 
+use App\Rules\ProductMovementQtyRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddProductMovementSaleRequest extends FormRequest
@@ -17,7 +18,7 @@ class AddProductMovementSaleRequest extends FormRequest
             'product_movement_id' => 'required|integer|exists:products_movement,id',
             'product_id' => 'required',
             'type_id' => 'required',
-            'qty' => 'required',
+            'qty' => ['required', new ProductMovementQtyRule()],
             'measurement_id' => 'required',
             'cost_price' => 'required',
             'retail_price' => 'required',

@@ -46,6 +46,11 @@ class Product extends Model
         return $this->hasMany(Media::class, 'parent_id', 'id')
             ->where('type_id', Media::PRODUCT_MEDIA);
     }
+
+    public function productsMovementItem()
+    {
+        return $this->hasMany(ProductsMovementItem::class, 'product_id', 'id');
+    }
 }
 
 

@@ -16,6 +16,7 @@ class ProductsMovementsItemResource extends JsonResource
             'product_movement_id' => $this->product_movement_id,
             'product_id' => $this->product_id,
             'type_id' => $this->type_id,
+            'type_title' => $this->getTypeTitle(),
             'qty' => $this->qty,
             'measurement_id' => $this->measurement_id,
             'cost_price' => $this->cost_price,
