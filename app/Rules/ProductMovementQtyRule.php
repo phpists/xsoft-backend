@@ -30,12 +30,12 @@ class ProductMovementQtyRule implements Rule
         }
 
 
-        if ($productMovement->qty <= $value) {
-            return true;
+        if ($value >= $productMovement->qty) {
+            $this->message = 'Максимальна кількість товарів на складі: ' . $productMovement->qty;
+            return false;
         }
 
-        $this->message = 'Максимальна кількість товарів на складі: ' . $productMovement->qty;
-        return false;
+        return true;
     }
 
     public function message()
