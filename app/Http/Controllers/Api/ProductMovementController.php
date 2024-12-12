@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductMovement\AddProductMovementSaleRequest;
+use App\Http\Requests\ProductMovement\DeleteProductMovementRequest;
 use App\Http\Requests\ProductMovement\GetProductMovementItemRequest;
 use App\Http\Requests\ProductMovement\GetProductMovementRequest;
 use App\Http\Requests\ProductMovement\SaveProductMovementRequest;
@@ -14,6 +15,7 @@ use App\Http\Resources\ProductsMovement\ProductsMovementsItemResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
+use App\Http\Resources\Traits\HasFullInfoFlag;
 use App\Models\Measurement;
 use App\Models\Product;
 use App\Models\ProductMovement;
@@ -44,7 +46,7 @@ class ProductMovementController extends CoreController
 
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
                 Route::post('update-product-movement', [static::class, 'updateProductMovement']);
-                Route::post('delete-products-movement', [static::class, 'deleteProductMovement']);
+                Route::delete('delete-products-movement', [static::class, 'deleteProductMovement']);
 
                 Route::post('add-product-movement-sale', [static::class, 'addProductMovementSale']);
 
@@ -230,7 +232,7 @@ class ProductMovementController extends CoreController
         ]);
     }
 
-    public function deleteProductMovement(Request $request)
+    public function deleteProductMovement(DeleteProductMovementRequest $request)
     {
         $data = $request->all();
         $productMovements = ProductMovement::whereIn('id', $data['idx'])->get();
@@ -322,17 +324,15 @@ class ProductMovementController extends CoreController
     public function getProductById(Request $request)
     {
         $data = $request->all();
-        $auth = User::find(auth()->id());
-        $product = Product::where('id', $data['id'])
-            ->where('company_id', $auth->getCurrentCompanyId())
+        $product = ProductsMovementItem::where('product_id', $data['id'])
             ->first();
 
         if (empty($product)) {
-            return $this->responseError('Товар не знайдений');
+            return $this->responseError('Всі товари продані!');
         }
 
         return $this->responseSuccess([
-            'product' => new ProductMovementResource($product)
+            'product' => new ProductsMovementsItemResource($product)
         ]);
     }
 }
