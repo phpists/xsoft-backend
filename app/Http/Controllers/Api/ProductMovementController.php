@@ -44,6 +44,7 @@ class ProductMovementController extends CoreController
 
                 Route::post('add-product-movement', [static::class, 'addProductMovement']);
                 Route::post('update-product-movement', [static::class, 'updateProductMovement']);
+                Route::post('delete-products-movement', [static::class, 'deleteProductMovement']);
 
                 Route::post('add-product-movement-sale', [static::class, 'addProductMovementSale']);
 
@@ -98,6 +99,7 @@ class ProductMovementController extends CoreController
 
         $this->setSorting($builder, [
             'id' => 'id',
+            'total_price' => 'total_price'
         ]);
 
         $productMovements = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
@@ -225,6 +227,23 @@ class ProductMovementController extends CoreController
         return $this->responseSuccess([
             'message' => 'Прихід успішно відредагований!',
             'product_movement' => new ProductsMovementResource($productMovement)
+        ]);
+    }
+
+    public function deleteProductMovement(Request $request)
+    {
+        $data = $request->all();
+        $productMovements = ProductMovement::whereIn('id', $data['idx'])->get();
+
+        if ($productMovements){
+            foreach ($productMovements as $productMovement){
+                ProductsMovementItem::where('product_movement_id', $productMovement->id)->delete();
+                $productMovement->delete();
+            }
+        }
+
+        return $this->responseSuccess([
+            'message' => 'Дані успішно видалені',
         ]);
     }
 

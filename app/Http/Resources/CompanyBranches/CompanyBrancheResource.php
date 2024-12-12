@@ -18,7 +18,7 @@ class CompanyBrancheResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'phones' => json_decode($this->phones),
-            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s')
+            'created_at' => Carbon::parse($this->created_at)->format('d.m.Y H:i:s')
         ];
 
         return $return;
