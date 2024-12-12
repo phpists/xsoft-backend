@@ -117,7 +117,7 @@ class ProductMovementController extends CoreController
         }
 
         return $this->responseSuccess([
-            'product_movement' => new ProductMovement($productMovement)
+            'product_movement' => new ProductMovementResource($productMovement)
         ]);
     }
 

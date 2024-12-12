@@ -4,6 +4,7 @@ namespace App\Http\Resources\Product;
 
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,23 +15,20 @@ class ProductMovementResource extends JsonResource
         $return = [
             'id' => $this->id,
             'company_id' => $this->company_id,
-            'user_id' => $this->user_id,
-            'brand_id' => $this->brand_id,
-            'category_id' => $this->category_id,
-            'article' => $this->article,
-            'title' => $this->title,
-            'description' => $this->description,
-            'product_measure_id' => $this->product_measure_id,
-            'color' => $this->color,
-            'balance' => $this->balance,
-            'cost_price' => $this->cost_price,
-            'retail_price' => $this->retail_price,
-            'materials_used_quantity' => $this->materials_used_quantity,
-            'materials_used_measure_id' => $this->materials_used_measure_id,
-            'created_at' => date('Y-d-m H:i:s', strtotime($this->created_at)),
-            'tags' => json_decode($this->tags),
-            'vendors' => json_decode($this->vendors),
-            'movements' => new ProductsMovementsItemsResource($this->productsMovementItem),
+            'staff_id' => $this->staff_id,
+            'warehouse_id' => $this->warehouse_id,
+            'supplier_id' => $this->supplier_id,
+            'type_id' => $this->type_id,
+            'type_title' => 'Прихід',
+            'date_create' => $this->date_create,
+            'time_create' => $this->time_create,
+            'debt' => $this->debt,
+            'installment_payment' => $this->installment_payment,
+            'box_office_date' => $this->box_office_date,
+            'total_price' => $this->total_price,
+            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
+
+            'items' => new ProductsMovementsItemsResource($this->items)
         ];
 
         return $return;
