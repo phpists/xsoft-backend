@@ -99,11 +99,12 @@ class ProductMovementController extends CoreController
         $builder = ProductMovement::query();
         $builder->where('company_id', $auth->getCurrentCompanyId());
 
+
         $this->setSorting($builder, [
             'id' => 'id',
             'total_price' => 'total_price'
         ]);
-
+        $builder->orderBy('id', 'desc');
         $productMovements = $builder->paginate($this->getPerPage($data['perPage'] ?? 15));
 
         return $this->responseSuccess([
@@ -237,8 +238,8 @@ class ProductMovementController extends CoreController
         $data = $request->all();
         $productMovements = ProductMovement::whereIn('id', $data['idx'])->get();
 
-        if ($productMovements){
-            foreach ($productMovements as $productMovement){
+        if ($productMovements) {
+            foreach ($productMovements as $productMovement) {
                 ProductsMovementItem::where('product_movement_id', $productMovement->id)->delete();
                 $productMovement->delete();
             }
@@ -258,6 +259,7 @@ class ProductMovementController extends CoreController
     {
         $data = $request->all();
         $builder = ProductsMovementItem::query();
+        $builder->where('type_id', ProductMovement::PARISH);
         $builder->whereHas('product', function ($query) use ($data) {
             $q = $data['q'];
             return $query->where('title', 'LIKE', "%$q%")
@@ -278,46 +280,55 @@ class ProductMovementController extends CoreController
     }
 
     /**
-     * Продажу товарів
+     * Продаж товарів
      */
     public function addProductMovementSale(AddProductMovementSaleRequest $request)
     {
         $data = $request->all();
-
-        /**
-         * Змінити валідацію 'qty'
-         */
-
-        $productsMovementItem = ProductsMovementItem::create([
-            'product_movement_id' => $data['product_movement_id'],
-            'product_id' => $data['product_id'],
+        $auth = User::find(auth()->id());
+        $newProductMovement = ProductMovement::create([
+            'staff_id' => $data['staff_id'],
+            'company_id' => $auth->getCurrentCompanyId(),
+            'warehouse_id' => $data['warehouse_id'],
             'type_id' => $data['type_id'],
-            'qty' => $data['qty'],
-            'measurement_id' => $data['measurement_id'],
-            'cost_price' => $data['cost_price'],
-            'retail_price' => $data['retail_price'],
-            'description' => $data['description']
+            'total_price' => $data['total_price'],
+            'date_create' => $data['date_create'],
+            'time_create' => $data['time_create'],
+            'debt' => isset($data['debt']) ? $data['debt'] : null,
+            'installment_payment' => isset($data['installment_payment']) ? $data['installment_payment'] : null,
+            'box_office_date' => $data['box_office_date']
         ]);
 
-        if ($productsMovementItem){
-            /**
-             * Списати одиницю
-             */
-            $productMovement = ProductsMovementItem::where('product_movement_id', request()->get('product_movement_id'))
-                ->where('product_id', request()->get('product_id'))
-                ->where('type_id', ProductMovement::PARISH)
-                ->first();
-
-            if ($productMovement) {
-                $productMovement->update([
-                    'qty' => $productMovement->qty - $data['qty'],
+        if (isset($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $productsMovementItem = ProductsMovementItem::create([
+                    'product_movement_id' => $newProductMovement->id,
+                    'product_id' => $item['product_id'],
+                    'type_id' => $data['type_id'],
+                    'qty' => $item['qty'],
+                    'measurement_id' => $item['measurement_id'],
+                    'cost_price' => $item['cost_price'],
+                    'retail_price' => $item['retail_price'],
                 ]);
+
+                if ($productsMovementItem) {
+                    $productMovement = ProductsMovementItem::where('product_movement_id', $data['product_movement_id'])
+                        ->where('product_id', $item['product_id'])
+                        ->where('type_id', ProductMovement::PARISH)
+                        ->first();
+
+                    if ($productMovement) {
+                        $productMovement->update([
+                            'qty' => $productMovement->qty - $item['qty'],
+                        ]);
+                    }
+                }
             }
         }
 
         return $this->responseSuccess([
             'message' => 'Дані успішно збережено',
-            'product_movement_item' => new ProductsMovementsItemResource($productsMovementItem)
+            'product_movement' => new ProductsMovementResource($newProductMovement)
         ]);
     }
 

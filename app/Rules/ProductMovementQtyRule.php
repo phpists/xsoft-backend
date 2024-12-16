@@ -19,18 +19,33 @@ class ProductMovementQtyRule implements Rule
 
     public function passes($attribute, $value)
     {
-        $productMovement = ProductsMovementItem::where('product_movement_id', request()->get('product_movement_id'))
-            ->where('product_id', request()->get('product_id'))
-            ->where('type_id', ProductMovement::PARISH)
-            ->first();
+        $requestParams = request()->all();
+        $items = $requestParams['items'] ?? [];
 
-        if (empty($productMovement)){
+        $currentItem = null;
+        foreach ($items as $item) {
+            if ($item['id'] === $value) {
+                $currentItem = $item;
+                break;
+            }
+        }
+
+        if (empty($currentItem)){
             $this->message = 'Невірна кількість';
             return false;
         }
 
+        $productMovement = ProductsMovementItem::where('id', $currentItem['id'])
+            ->where('product_id', $currentItem['product_id'])
+            ->where('type_id', ProductMovement::PARISH)
+            ->first();
 
-        if ($value >= $productMovement->qty) {
+        if (empty($productMovement)) {
+            $this->message = 'Невірна кількість';
+            return false;
+        }
+
+        if ($currentItem['qty'] >= $productMovement->qty) {
             $this->message = 'Максимальна кількість товарів на складі: ' . $productMovement->qty;
             return false;
         }

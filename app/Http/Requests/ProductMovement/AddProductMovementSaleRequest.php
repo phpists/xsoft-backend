@@ -16,13 +16,17 @@ class AddProductMovementSaleRequest extends FormRequest
     {
         return [
             'product_movement_id' => 'required|integer|exists:products_movement,id',
-            'product_id' => 'required',
             'type_id' => 'required',
-            'qty' => ['required', new ProductMovementQtyRule()],
-            'measurement_id' => 'required',
-            'cost_price' => 'required',
-            'retail_price' => 'required',
-            'description' => 'sometimes',
+            'items.*' => 'required',
+            'items.*.id' => ['required', new ProductMovementQtyRule()],
+            'items.*.qty' => ['required'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'id.exists' => 'Такого товару на складі вже немає!'
         ];
     }
 
