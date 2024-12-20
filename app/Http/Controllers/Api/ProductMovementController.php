@@ -266,16 +266,16 @@ class ProductMovementController extends CoreController
                 ->orWhere('article', 'LIKE', "%$q%");
         });
 
-        $item = $builder->first();
+        $items = $builder->get();
 
-        if (empty($item)) {
+        if (empty($items)) {
             return $this->responseSuccess([
                 'product_movement_item' => []
             ]);
         }
 
         return $this->responseSuccess([
-            'product_movement_item' => new ProductsMovementsItemResource($item)
+            'product_movement_items' => new ProductsMovementsItemsResource($items)
         ]);
     }
 
@@ -312,7 +312,7 @@ class ProductMovementController extends CoreController
                 ]);
 
                 if ($productsMovementItem) {
-                    $productMovement = ProductsMovementItem::where('product_movement_id', $data['product_movement_id'])
+                    $productMovement = ProductsMovementItem::where('product_movement_id', $item['product_movement_id'])
                         ->where('product_id', $item['product_id'])
                         ->where('type_id', ProductMovement::PARISH)
                         ->first();

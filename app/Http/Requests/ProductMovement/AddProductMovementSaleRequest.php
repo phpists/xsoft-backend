@@ -15,7 +15,6 @@ class AddProductMovementSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_movement_id' => 'required|integer|exists:products_movement,id',
             'type_id' => 'required',
             'items.*' => 'required',
             'items.*.id' => ['required', new ProductMovementQtyRule()],

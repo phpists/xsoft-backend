@@ -36,6 +36,7 @@ class ProductMovementQtyRule implements Rule
         }
 
         $productMovement = ProductsMovementItem::where('id', $currentItem['id'])
+            ->where('product_movement_id', $currentItem['product_movement_id'])
             ->where('product_id', $currentItem['product_id'])
             ->where('type_id', ProductMovement::PARISH)
             ->first();
