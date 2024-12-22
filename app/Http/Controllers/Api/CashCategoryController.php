@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 class CashCategoryController extends CoreController
 {
+    /**
+     * Статті для кас
+     */
     public static function routers()
     {
         Route::group(

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 \App\Http\Controllers\Api\ProfileController::routers();
 \App\Http\Controllers\Api\WarehouseController::routers();
 \App\Http\Controllers\Api\CashCategoryController::routers();
+\App\Http\Controllers\Api\CashesController::routers();
 
 
 
