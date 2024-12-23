@@ -16,6 +16,7 @@ class Cashes extends Model
         'appointment',
         'description',
         'is_cash_category',
+        'total'
     ];
 
     public function cashCategories()
@@ -23,4 +24,9 @@ class Cashes extends Model
         return $this->hasMany(CashesCategory::class, 'cashes_id', 'id')
             ->with('category');
     }
+
+//    public function cashCategories2()
+//    {
+//        return $this->belongsToMany(CashCategory::class, 'cashes_categories', 'cash_category_id');
+//    }
 }
