@@ -19,6 +19,8 @@ class AddProductMovementSaleRequest extends FormRequest
             'items.*' => 'required',
             'items.*.id' => ['required', new ProductMovementQtyRule()],
             'items.*.qty' => ['required'],
+            'cashes.cashes_id' => 'required',
+            'cashes.amount' => 'required'
         ];
     }
 

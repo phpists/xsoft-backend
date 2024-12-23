@@ -23,7 +23,10 @@ class SaveProductMovementRequest extends FormRequest
             'debt' => 'sometimes',
             'installment_payment' => 'sometimes',
             'box_office_date' => 'sometimes',
-            'items.*' => 'required'
+            'items.*' => 'required',
+            'cashes.cashes_id' => 'required',
+            'cashes.amount' => 'required'
         ];
+
     }
 }

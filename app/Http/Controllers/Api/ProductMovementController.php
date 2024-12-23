@@ -16,6 +16,7 @@ use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
+use App\Models\CashesHistory;
 use App\Models\Measurement;
 use App\Models\Product;
 use App\Models\ProductMovement;
@@ -164,6 +165,14 @@ class ProductMovementController extends CoreController
         ]);
 
         if ($productMovement) {
+            CashesHistory::create([
+                'user_id' => $auth->id,
+                'cashes_id' => $data['cashes']['cashes_id'],
+                'type_id' => ProductMovement::PARISH,
+                'amount' => $data['cashes']['amount'],
+                'amount_cashes' => 0
+            ]);
+
             if (isset($data['items'])) {
                 foreach ($data['items'] as $item) {
                     ProductsMovementItem::create([
@@ -298,6 +307,16 @@ class ProductMovementController extends CoreController
             'installment_payment' => isset($data['installment_payment']) ? $data['installment_payment'] : null,
             'box_office_date' => $data['box_office_date']
         ]);
+
+        if ($newProductMovement){
+            CashesHistory::create([
+                'user_id' => $auth->id,
+                'cashes_id' => $data['cashes']['cashes_id'],
+                'type_id' => $data['type_id'],
+                'amount' => $data['cashes']['amount'],
+                'amount_cashes' => 0
+            ]);
+        }
 
         if (isset($data['items'])) {
             foreach ($data['items'] as $item) {
