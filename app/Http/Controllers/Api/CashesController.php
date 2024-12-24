@@ -8,9 +8,11 @@ use App\Http\Requests\Cashes\GetCasheById;
 use App\Http\Requests\Cashes\SaveCashesRequest;
 use App\Http\Requests\Cashes\UpdateCashesRequest;
 use App\Http\Resources\Cashes\CasheResource;
+use App\Http\Resources\Cashes\CashesHistoryResource;
 use App\Http\Resources\Cashes\CashesResource;
 use App\Models\Cashes;
 use App\Models\CashesCategory;
+use App\Models\CashesHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -34,6 +36,9 @@ class CashesController extends CoreController
                 Route::post('add-cash', [static::class, 'addCash']);
                 Route::post('edit-cash', [static::class, 'editCash']);
                 Route::delete('delete-cash', [static::class, 'deleteCash']);
+
+
+                Route::get('get-cash-transactions', [static::class, 'getCashTransactions']);
             }
         );
     }
@@ -137,6 +142,16 @@ class CashesController extends CoreController
 
         return $this->responseSuccess([
             'message' => 'Каса успішно видалена',
+        ]);
+    }
+
+    public function getCashTransactions(GetCasheById $request)
+    {
+        $data = $request->all();
+        $transactions = CashesHistory::where('cashes_id', $data['id'])->get();
+
+        return $this->responseSuccess([
+           'transactions' => new CashesHistoryResource($transactions)
         ]);
     }
 }

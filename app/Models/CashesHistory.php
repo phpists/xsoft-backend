@@ -17,4 +17,32 @@ class CashesHistory extends Model
         'amount',
         'amount_cashes'
     ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function cashes()
+    {
+        return $this->hasOne(Cashes::class, 'id', 'cashes_id');
+    }
+
+    public function getTypeTitle()
+    {
+        $title = '';
+        switch ($this->type_id) {
+            case ProductMovement::PARISH;
+                $title = 'Прихід';
+                break;
+            case ProductMovement::SALE;
+                $title = 'Продаж';
+                break;
+            case ProductMovement::WRITE_DOWN;
+                $title = 'Списання';
+                break;
+        }
+
+        return $title;
+    }
 }
