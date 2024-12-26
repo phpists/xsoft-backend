@@ -58,4 +58,16 @@ class ProductMovement extends Model
     {
         return $this->hasMany(ProductsMovementItem::class, 'product_movement_id', 'id');
     }
+
+    public function getItemTotalCostPrice()
+    {
+        $total = 0;
+        if ($this->items) {
+            foreach ($this->items as $item) {
+                $total += $item->cost_price * $item->qty;
+            }
+        }
+
+        return $total;
+    }
 }

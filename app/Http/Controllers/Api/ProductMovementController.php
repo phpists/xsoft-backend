@@ -16,6 +16,7 @@ use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsResource;
 use App\Http\Resources\Supplier\SuppliersCollectResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
+use App\Models\Cashes;
 use App\Models\CashesHistory;
 use App\Models\Measurement;
 use App\Models\Product;
@@ -165,14 +166,6 @@ class ProductMovementController extends CoreController
         ]);
 
         if ($productMovement) {
-            CashesHistory::create([
-                'user_id' => $auth->id,
-                'cashes_id' => $data['cashes']['cashes_id'],
-                'type_id' => ProductMovement::PARISH,
-                'amount' => $data['cashes']['amount'],
-                'amount_cashes' => 0
-            ]);
-
             if (isset($data['items'])) {
                 foreach ($data['items'] as $item) {
                     ProductsMovementItem::create([
@@ -186,6 +179,21 @@ class ProductMovementController extends CoreController
                     ]);
                 }
             }
+
+            $cashes = Cashes::find($data['cashes']['cashes_id']);
+
+            if ($cashes) {
+                $cashes->total = $cashes->total - $data['cashes']['amount'];
+                $cashes->update();
+            }
+
+            CashesHistory::create([
+                'user_id' => $auth->id,
+                'cashes_id' => $data['cashes']['cashes_id'],
+                'type_id' => ProductMovement::PARISH,
+                'amount' => $data['cashes']['amount'],
+                'amount_cashes' => $cashes->total
+            ]);
         }
 
         return $this->responseSuccess([
@@ -308,16 +316,6 @@ class ProductMovementController extends CoreController
             'box_office_date' => $data['box_office_date']
         ]);
 
-        if ($newProductMovement){
-            CashesHistory::create([
-                'user_id' => $auth->id,
-                'cashes_id' => $data['cashes']['cashes_id'],
-                'type_id' => $data['type_id'],
-                'amount' => $data['cashes']['amount'],
-                'amount_cashes' => 0
-            ]);
-        }
-
         if (isset($data['items'])) {
             foreach ($data['items'] as $item) {
                 $productsMovementItem = ProductsMovementItem::create([
@@ -343,6 +341,27 @@ class ProductMovementController extends CoreController
                     }
                 }
             }
+        }
+
+        if ($newProductMovement) {
+            $cashes = Cashes::find($data['cashes']['cashes_id']);
+
+            if ($cashes) {
+                if ($data['type_id'] == ProductMovement::SALE) {
+                    $cashes->total -= $data['cashes']['amount'];
+                } elseif ($data['type_id'] == ProductMovement::WRITE_DOWN) {
+                    $cashes->total += $data['cashes']['amount'];
+                }
+                $cashes->update();
+            }
+
+            CashesHistory::create([
+                'user_id' => $auth->id,
+                'cashes_id' => $data['cashes']['cashes_id'],
+                'type_id' => $data['type_id'],
+                'amount' => $data['cashes']['amount'],
+                'amount_cashes' => $cashes->total
+            ]);
         }
 
         return $this->responseSuccess([

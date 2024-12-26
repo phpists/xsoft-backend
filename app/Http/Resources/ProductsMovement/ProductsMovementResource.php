@@ -23,9 +23,9 @@ class ProductsMovementResource extends JsonResource
             'debt' => $this->debt,
             'installment_payment' => $this->installment_payment,
             'box_office_date' => $this->box_office_date,
+            'total_cost_price' => $this->getItemTotalCostPrice(),
             'total_price' => $this->total_price,
             'created_at' => Carbon::parse($this->created_at)->format('d.m.Y H:i:s'),
-
             'items' => new ProductsMovementsItemsResource($this->items)
         ];
 
