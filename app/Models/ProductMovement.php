@@ -19,7 +19,8 @@ class ProductMovement extends Model
     const PARISH = 1; // Прихід
     const SALE = 2; // Продаж
     const WRITE_DOWN = 3; // Списання
-    const DEBT = 4; // Списання
+    const DEBT = 4; // Борг
+    const DEBT_PAID = 5; // Борг сплачений
 
     protected $table = 'products_movement';
     protected $fillable = [
@@ -52,6 +53,9 @@ class ProductMovement extends Model
                 break;
             case self::DEBT;
                 $title = 'Борг';
+                break;
+            case self::DEBT_PAID;
+                $title = 'Борг сплачений';
                 break;
         }
 

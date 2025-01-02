@@ -39,6 +39,12 @@ class ProductsMovementItem extends Model
             case ProductMovement::WRITE_DOWN;
                 $title = 'Списання';
                 break;
+            case ProductMovement::DEBT;
+                $title = 'Борг';
+                break;
+            case ProductMovement::DEBT_PAID;
+                $title = 'Борг сплачений';
+                break;
         }
 
         return $title;

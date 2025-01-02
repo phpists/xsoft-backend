@@ -40,6 +40,7 @@ class CashesController extends CoreController
 
 
                 Route::get('get-cash-transactions', [static::class, 'getCashTransactions']);
+                Route::post('debt-paid', [static::class, 'debtPaid']);
             }
         );
     }
@@ -162,6 +163,33 @@ class CashesController extends CoreController
 
         return $this->responseSuccess([
             'transactions' => new CashesHistoryResource($transactions)
+        ]);
+    }
+
+    /**
+     * Сплатити борг
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function debtPaid(Request $request)
+    {
+        $data = $request->all();
+        $cashesHistory = CashesHistory::find($data['id']);
+        $productsMovement = ProductMovement::find($cashesHistory->product_movement_id);
+
+        if (isset($cashesHistory) && isset($productsMovement)){
+            $productsMovement->debt -= $cashesHistory->amount;
+            $productsMovement->update();
+
+            $cashesHistory->type_id = ProductMovement::DEBT_PAID;
+            $cashesHistory->update();
+        } else {
+            return $this->responseError('Борг не знайдений');
+        }
+
+        return $this->responseSuccess([
+            'status' => true,
+            'message' => 'Борг успішно сплачений'
         ]);
     }
 }
