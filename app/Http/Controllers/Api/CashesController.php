@@ -8,6 +8,7 @@ use App\Http\Requests\Cashes\GetCasheById;
 use App\Http\Requests\Cashes\SaveCashesRequest;
 use App\Http\Requests\Cashes\UpdateCashesRequest;
 use App\Http\Resources\Cashes\CasheResource;
+use App\Http\Resources\Cashes\CashesHistoryItemResource;
 use App\Http\Resources\Cashes\CashesHistoryResource;
 use App\Http\Resources\Cashes\CashesResource;
 use App\Models\Cashes;
@@ -40,7 +41,10 @@ class CashesController extends CoreController
 
 
                 Route::get('get-cash-transactions', [static::class, 'getCashTransactions']);
+
+                Route::get('get-debt', [static::class, 'getDebt']);
                 Route::post('debt-paid', [static::class, 'debtPaid']);
+                Route::post('cancel-debt-paid', [static::class, 'cancelDebtPaid']);
             }
         );
     }
@@ -153,7 +157,7 @@ class CashesController extends CoreController
         $query = CashesHistory::query();
         $query->where('cashes_id', $data['id']);
 
-        if (isset($data['debt_status']) && $data['debt_status'] === 'true'){
+        if (isset($data['debt_status']) && $data['debt_status'] === 'true') {
             $query->where('type_id', ProductMovement::DEBT);
         }
 
@@ -167,29 +171,82 @@ class CashesController extends CoreController
     }
 
     /**
-     * Сплатити борг
+     * Отримати борг по id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDebt(Request $request)
+    {
+        $data = $request->all();
+        $transaction = CashesHistory::where('id', $data['id'])
+            ->where('type_id', ProductMovement::DEBT)
+            ->first();
+
+        if (empty($transaction)){
+            return $this->responseError('Борг не знайдений');
+        }
+
+        return $this->responseSuccess([
+           'transaction' => new CashesHistoryItemResource($transaction)
+        ]);
+    }
+
+    /**
+     * Оплатити борг
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function debtPaid(Request $request)
     {
         $data = $request->all();
-        $cashesHistory = CashesHistory::find($data['id']);
-        $productsMovement = ProductMovement::find($cashesHistory->product_movement_id);
+        $cashesHistory = CashesHistory::where('id', $data['id'])
+            ->where('type_id', ProductMovement::DEBT)
+            ->first();
 
-        if (isset($cashesHistory) && isset($productsMovement)){
-            $productsMovement->debt -= $cashesHistory->amount;
-            $productsMovement->update();
-
-            $cashesHistory->type_id = ProductMovement::DEBT_PAID;
-            $cashesHistory->update();
-        } else {
+        if (empty($cashesHistory)){
             return $this->responseError('Борг не знайдений');
         }
 
+        $cashes = Cashes::find($cashesHistory->cashes_id);
+
+        if (isset($cashesHistory) && isset($cashes)) {
+            $cashes->debt -= $cashesHistory->amount;
+            $cashes->update();
+
+            $cashesHistory->type_id = ProductMovement::DEBT_PAID;
+            $cashesHistory->update();
+
+            return $this->responseSuccess([
+                'status' => true,
+                'message' => 'Борг успішно оплачений'
+            ]);
+        } else {
+            return $this->responseError('Борг не знайдений');
+        }
+    }
+
+    /**
+     * Відмінити оплату боргу
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelDebtPaid(Request $request)
+    {
+        $data = $request->all();
+        $cashesHistory = CashesHistory::where('id', $data['id'])
+            ->where('type_id', ProductMovement::DEBT)
+            ->first();
+
+        if (empty($cashesHistory)){
+            return $this->responseError('Борг не знайдений');
+        }
+
+        $cashesHistory->type_id = ProductMovement::DEBT_PAID;
+        $cashesHistory->update();
+
         return $this->responseSuccess([
             'status' => true,
-            'message' => 'Борг успішно сплачений'
+            'message' => 'Борг успішно відмінений'
         ]);
     }
 }

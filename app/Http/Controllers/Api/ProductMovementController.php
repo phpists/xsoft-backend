@@ -243,7 +243,6 @@ class ProductMovementController extends CoreController
             'box_office_date' => $data['box_office_date']
         ]);
 
-
         if (isset($data['items'])) {
             foreach ($data['items'] as $item) {
                 ProductsMovementItem::updateOrCreate([
