@@ -19,6 +19,7 @@ class ProductMovement extends Model
     const PARISH = 1; // Прихід
     const SALE = 2; // Продаж
     const WRITE_DOWN = 3; // Списання
+    const DEBT = 4; // Списання
 
     protected $table = 'products_movement';
     protected $fillable = [
@@ -48,6 +49,9 @@ class ProductMovement extends Model
                 break;
             case self::WRITE_DOWN;
                 $title = 'Списання';
+                break;
+            case self::DEBT;
+                $title = 'Борг';
                 break;
         }
 

@@ -41,6 +41,9 @@ class CashesHistory extends Model
             case ProductMovement::WRITE_DOWN;
                 $title = 'Списання';
                 break;
+            case ProductMovement::DEBT;
+                $title = 'Борг';
+                break;
         }
 
         return $title;

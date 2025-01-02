@@ -189,6 +189,14 @@ class ProductMovementController extends CoreController
 
                     if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
                         $cashes->debt -= $data['debt_data']['amount'];
+
+                        CashesHistory::create([
+                            'user_id' => $auth->id,
+                            'cashes_id' => $data['debt_data']['cashes_id'],
+                            'type_id' => ProductMovement::DEBT,
+                            'amount' => $data['debt_data']['amount'],
+                            'amount_cashes' => $cashes->total
+                        ]);
                     }
                     $cashes->update();
                 }
@@ -356,13 +364,21 @@ class ProductMovementController extends CoreController
 
                 if ($cashes) {
                     if ($data['type_id'] == ProductMovement::SALE) {
-                        $cashes->total -= $data['cashes']['amount'];
+                        $cashes->total -= $cashesItem['amount'];
                     } elseif ($data['type_id'] == ProductMovement::WRITE_DOWN) {
-                        $cashes->total += $data['cashes']['amount'];
+                        $cashes->total += $cashesItem['amount'];
                     }
 
                     if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
                         $cashes->debt -= $data['debt_data']['amount'];
+
+                        CashesHistory::create([
+                            'user_id' => $auth->id,
+                            'cashes_id' => $data['debt_data']['cashes_id'],
+                            'type_id' => ProductMovement::DEBT,
+                            'amount' => $data['debt_data']['amount'],
+                            'amount_cashes' => $cashes->total
+                        ]);
                     }
                     $cashes->update();
                 }

@@ -148,7 +148,9 @@ class CashesController extends CoreController
     public function getCashTransactions(GetCasheById $request)
     {
         $data = $request->all();
-        $transactions = CashesHistory::where('cashes_id', $data['id'])->get();
+        $transactions = CashesHistory::where('cashes_id', $data['id'])
+            ->orderBy('id', 'desc')
+            ->get();
 
         return $this->responseSuccess([
            'transactions' => new CashesHistoryResource($transactions)
