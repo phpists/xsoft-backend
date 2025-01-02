@@ -63,6 +63,11 @@ class ProductMovement extends Model
         return $this->hasMany(ProductsMovementItem::class, 'product_movement_id', 'id');
     }
 
+    public function cashesHistory()
+    {
+        return $this->hasMany(CashesHistory::class, 'product_movement_id', 'id');
+    }
+
     public function getItemTotalCostPrice()
     {
         $total = 0;

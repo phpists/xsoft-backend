@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Product;
 
+use App\Http\Resources\Cashes\CashesHistoryResource;
 use App\Http\Resources\ProductsMovement\ProductsMovementsItemsResource;
 use App\Http\Resources\Traits\HasFullInfoFlag;
 use Carbon\Carbon;
@@ -28,7 +29,8 @@ class ProductMovementResource extends JsonResource
             'total_price' => $this->total_price,
             'created_at' => Carbon::parse($this->created_at)->format('d.m.Y H:i:s'),
 
-            'items' => new ProductsMovementsItemsResource($this->items)
+            'items' => new ProductsMovementsItemsResource($this->items),
+            'cashes_history' => new CashesHistoryResource($this->cashesHistory),
         ];
 
         return $return;

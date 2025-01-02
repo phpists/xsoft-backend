@@ -152,7 +152,7 @@ class CashesController extends CoreController
         $query = CashesHistory::query();
         $query->where('cashes_id', $data['id']);
 
-        if (!empty($data['debt_status'])){
+        if (isset($data['debt_status']) && $data['debt_status'] === 'true'){
             $query->where('type_id', ProductMovement::DEBT);
         }
 
