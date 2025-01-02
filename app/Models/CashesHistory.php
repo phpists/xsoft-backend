@@ -11,6 +11,7 @@ class CashesHistory extends Model
 
     protected $table = 'cashes_history';
     protected $fillable = [
+        'product_movement_id',
         'user_id',
         'cashes_id',
         'type_id',

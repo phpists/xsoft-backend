@@ -191,6 +191,7 @@ class ProductMovementController extends CoreController
                         $cashes->debt -= $data['debt_data']['amount'];
 
                         CashesHistory::create([
+                            'product_movement_id' => $productMovement->id,
                             'user_id' => $auth->id,
                             'cashes_id' => $data['debt_data']['cashes_id'],
                             'type_id' => ProductMovement::DEBT,
@@ -202,6 +203,7 @@ class ProductMovementController extends CoreController
                 }
 
                 CashesHistory::create([
+                    'product_movement_id' => $productMovement->id,
                     'user_id' => $auth->id,
                     'cashes_id' => $cashesItem['cashes_id'],
                     'type_id' => ProductMovement::PARISH,
@@ -373,6 +375,7 @@ class ProductMovementController extends CoreController
                         $cashes->debt -= $data['debt_data']['amount'];
 
                         CashesHistory::create([
+                            'product_movement_id' => $productMovement->id,
                             'user_id' => $auth->id,
                             'cashes_id' => $data['debt_data']['cashes_id'],
                             'type_id' => ProductMovement::DEBT,
@@ -384,6 +387,7 @@ class ProductMovementController extends CoreController
                 }
 
                 CashesHistory::create([
+                    'product_movement_id' => $productMovement->id,
                     'user_id' => $auth->id,
                     'cashes_id' => $cashesItem['cashes_id'],
                     'type_id' => $data['type_id'],

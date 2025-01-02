@@ -17,6 +17,7 @@ class CashesHistoryItemResource extends JsonResource
     {
         $return = [
             'id' => $this->id,
+            'product_movement_id' => $this->product_movement_id,
             'user_id' => $this->user_id,
             'cashes_id' => $this->cashes_id,
             'type_id' => $this->getTypeTitle(),

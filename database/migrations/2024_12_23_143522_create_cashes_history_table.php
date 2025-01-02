@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('cashes_history', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('product_movement_id')->comment('Id списання/продажу/приходу');
             $table->bigInteger('user_id')->comment('Id користувача який здійснив операцію');
             $table->bigInteger('cashes_id')->comment(' Id каси');
             $table->integer('type_id')->comment('Тип списання Прихід/Продажа/Списання');
