@@ -13,6 +13,7 @@ use App\Http\Resources\Cashes\CashesResource;
 use App\Models\Cashes;
 use App\Models\CashesCategory;
 use App\Models\CashesHistory;
+use App\Models\ProductMovement;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -148,12 +149,19 @@ class CashesController extends CoreController
     public function getCashTransactions(GetCasheById $request)
     {
         $data = $request->all();
-        $transactions = CashesHistory::where('cashes_id', $data['id'])
-            ->orderBy('id', 'desc')
-            ->get();
+        $query = CashesHistory::query();
+        $query->where('cashes_id', $data['id']);
+
+        if (!empty($data['debt_status'])){
+            $query->where('type_id', ProductMovement::DEBT);
+        }
+
+        $query->orderBy('id', 'desc');
+
+        $transactions = $query->get();
 
         return $this->responseSuccess([
-           'transactions' => new CashesHistoryResource($transactions)
+            'transactions' => new CashesHistoryResource($transactions)
         ]);
     }
 }

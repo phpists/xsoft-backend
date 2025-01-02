@@ -187,7 +187,7 @@ class ProductMovementController extends CoreController
                 if ($cashes) {
                     $cashes->total -= $cashesItem['amount'];
 
-                    if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
+                    if (isset($data['debt_data']['cashes_id']) && $cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
                         $cashes->debt -= $data['debt_data']['amount'];
 
                         CashesHistory::create([
@@ -204,7 +204,7 @@ class ProductMovementController extends CoreController
                 CashesHistory::create([
                     'user_id' => $auth->id,
                     'cashes_id' => $cashesItem['cashes_id'],
-                    'type_id' => $data['type_id'],
+                    'type_id' => ProductMovement::PARISH,
                     'amount' => $cashesItem['amount'],
                     'amount_cashes' => $cashes->total
                 ]);
@@ -369,7 +369,7 @@ class ProductMovementController extends CoreController
                         $cashes->total += $cashesItem['amount'];
                     }
 
-                    if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
+                    if (isset($data['debt_data']['cashes_id']) && $cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
                         $cashes->debt -= $data['debt_data']['amount'];
 
                         CashesHistory::create([

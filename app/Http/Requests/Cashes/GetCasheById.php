@@ -15,6 +15,7 @@ class GetCasheById extends FormRequest
     {
         return [
             'id' => 'required|integer|exists:cashes,id',
+            'debt_status' => 'something',
         ];
     }
 }
