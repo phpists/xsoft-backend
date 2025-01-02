@@ -16,7 +16,8 @@ class Cashes extends Model
         'appointment',
         'description',
         'is_cash_category',
-        'total'
+        'total',
+        'debt'
     ];
 
     public function cashCategories()

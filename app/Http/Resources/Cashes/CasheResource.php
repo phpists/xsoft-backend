@@ -18,6 +18,7 @@ class CasheResource extends JsonResource
             'description' => $this->description,
             'is_cash_category' => $this->is_cash_category,
             'total' => $this->total,
+            'debt' => $this->debt,
             'created_at' => Carbon::parse($this->created_at)->format('d.m.Y H:i:s'),
             'cash_categories' => $this->cashCategories,
         ];

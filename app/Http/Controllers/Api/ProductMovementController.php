@@ -180,20 +180,27 @@ class ProductMovementController extends CoreController
                 }
             }
 
-            $cashes = Cashes::find($data['cashes']['cashes_id']);
+            // Списання з каси
+            foreach ($data['cashes'] as $cashesItem) {
+                $cashes = Cashes::find($cashesItem['cashes_id']);
 
-            if ($cashes) {
-                $cashes->total = $cashes->total - $data['cashes']['amount'];
-                $cashes->update();
+                if ($cashes) {
+                    $cashes->total -= $cashesItem['amount'];
+
+                    if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
+                        $cashes->debt -= $data['debt_data']['amount'];
+                    }
+                    $cashes->update();
+                }
+
+                CashesHistory::create([
+                    'user_id' => $auth->id,
+                    'cashes_id' => $cashesItem['cashes_id'],
+                    'type_id' => $data['type_id'],
+                    'amount' => $cashesItem['amount'],
+                    'amount_cashes' => $cashes->total
+                ]);
             }
-
-            CashesHistory::create([
-                'user_id' => $auth->id,
-                'cashes_id' => $data['cashes']['cashes_id'],
-                'type_id' => ProductMovement::PARISH,
-                'amount' => $data['cashes']['amount'],
-                'amount_cashes' => $cashes->total
-            ]);
         }
 
         return $this->responseSuccess([
@@ -344,24 +351,30 @@ class ProductMovementController extends CoreController
         }
 
         if ($newProductMovement) {
-            $cashes = Cashes::find($data['cashes']['cashes_id']);
+            foreach ($data['cashes'] as $cashesItem) {
+                $cashes = Cashes::find($cashesItem['cashes_id']);
 
-            if ($cashes) {
-                if ($data['type_id'] == ProductMovement::SALE) {
-                    $cashes->total -= $data['cashes']['amount'];
-                } elseif ($data['type_id'] == ProductMovement::WRITE_DOWN) {
-                    $cashes->total += $data['cashes']['amount'];
+                if ($cashes) {
+                    if ($data['type_id'] == ProductMovement::SALE) {
+                        $cashes->total -= $data['cashes']['amount'];
+                    } elseif ($data['type_id'] == ProductMovement::WRITE_DOWN) {
+                        $cashes->total += $data['cashes']['amount'];
+                    }
+
+                    if ($cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
+                        $cashes->debt -= $data['debt_data']['amount'];
+                    }
+                    $cashes->update();
                 }
-                $cashes->update();
-            }
 
-            CashesHistory::create([
-                'user_id' => $auth->id,
-                'cashes_id' => $data['cashes']['cashes_id'],
-                'type_id' => $data['type_id'],
-                'amount' => $data['cashes']['amount'],
-                'amount_cashes' => $cashes->total
-            ]);
+                CashesHistory::create([
+                    'user_id' => $auth->id,
+                    'cashes_id' => $cashesItem['cashes_id'],
+                    'type_id' => $data['type_id'],
+                    'amount' => $cashesItem['amount'],
+                    'amount_cashes' => $cashes->total
+                ]);
+            }
         }
 
         return $this->responseSuccess([

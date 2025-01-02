@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('appointment');
             $table->text('description');
             $table->boolean('is_cash_category'); // Прив’язати касу до статей
-            $table->float('total');
+            $table->float('total')->default(0);
+            $table->float('debt')->default(0);
             $table->timestamps();
         });
     }
