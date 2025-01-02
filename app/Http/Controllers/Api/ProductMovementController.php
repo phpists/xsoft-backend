@@ -28,6 +28,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class ProductMovementController extends CoreController
@@ -185,31 +186,38 @@ class ProductMovementController extends CoreController
                 $cashes = Cashes::find($cashesItem['cashes_id']);
 
                 if ($cashes) {
+                    CashesHistory::create([
+                        'product_movement_id' => $productMovement->id,
+                        'user_id' => $auth->id,
+                        'cashes_id' => $cashesItem['cashes_id'],
+                        'type_id' => ProductMovement::PARISH,
+                        'amount' => $cashesItem['amount'],
+                        'amount_cashes' => $cashes->total
+                    ]);
+
                     $cashes->total -= $cashesItem['amount'];
-
-                    if (isset($data['debt_data']['cashes_id']) && $cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
-                        $cashes->debt -= $data['debt_data']['amount'];
-
-                        CashesHistory::create([
-                            'product_movement_id' => $productMovement->id,
-                            'user_id' => $auth->id,
-                            'cashes_id' => $data['debt_data']['cashes_id'],
-                            'type_id' => ProductMovement::DEBT,
-                            'amount' => $data['debt_data']['amount'],
-                            'amount_cashes' => $cashes->total
-                        ]);
-                    }
                     $cashes->update();
                 }
+            }
 
-                CashesHistory::create([
-                    'product_movement_id' => $productMovement->id,
-                    'user_id' => $auth->id,
-                    'cashes_id' => $cashesItem['cashes_id'],
-                    'type_id' => ProductMovement::PARISH,
-                    'amount' => $cashesItem['amount'],
-                    'amount_cashes' => $cashes->total
-                ]);
+            // Борг
+            if (isset($data['debt_data'])) {
+                $debt = $data['debt_data'];
+                $cashes = Cashes::find($debt['cashes_id']);
+
+                if ($cashes) {
+                    CashesHistory::create([
+                        'product_movement_id' => $productMovement->id,
+                        'user_id' => $auth->id,
+                        'cashes_id' => $debt['cashes_id'],
+                        'type_id' => ProductMovement::DEBT,
+                        'amount' => $debt['amount'],
+                        'amount_cashes' => $cashes->total
+                    ]);
+
+                    $cashes->debt -= $debt['amount'];
+                    $cashes->update();
+                }
             }
         }
 
@@ -258,6 +266,28 @@ class ProductMovementController extends CoreController
                     'retail_price' => $item['retail_price']
                 ]);
             }
+        }
+
+        // Зміна боргу
+        if (isset($data['debt_data'])) {
+            $debt = $data['debt_data'];
+            $cashesHistory = CashesHistory::where('id', $debt['id'])->first();
+
+            $cashes = Cashes::find($cashesHistory->cashes_id);
+            if ($cashes) {
+                $cashes->debt += $cashesHistory['amount'];
+                $cashes->update();
+            }
+
+            $cashes = Cashes::find($debt['cashes_id']);
+            if ($cashes) {
+                $cashes->debt -= $cashesHistory['amount'];
+                $cashes->update();
+            }
+
+            $cashesHistory->update([
+                'cashes_id' => $debt['cashes_id'],
+            ]);
         }
 
         return $this->responseSuccess([
@@ -364,35 +394,42 @@ class ProductMovementController extends CoreController
                 $cashes = Cashes::find($cashesItem['cashes_id']);
 
                 if ($cashes) {
+                    CashesHistory::create([
+                        'product_movement_id' => $newProductMovement->id,
+                        'user_id' => $auth->id,
+                        'cashes_id' => $cashesItem['cashes_id'],
+                        'type_id' => $data['type_id'],
+                        'amount' => $cashesItem['amount'],
+                        'amount_cashes' => $cashes->total
+                    ]);
+
                     if ($data['type_id'] == ProductMovement::SALE) {
                         $cashes->total -= $cashesItem['amount'];
                     } elseif ($data['type_id'] == ProductMovement::WRITE_DOWN) {
                         $cashes->total += $cashesItem['amount'];
                     }
-
-                    if (isset($data['debt_data']['cashes_id']) && $cashesItem['cashes_id'] == $data['debt_data']['cashes_id']){
-                        $cashes->debt -= $data['debt_data']['amount'];
-
-                        CashesHistory::create([
-                            'product_movement_id' => $productMovement->id,
-                            'user_id' => $auth->id,
-                            'cashes_id' => $data['debt_data']['cashes_id'],
-                            'type_id' => ProductMovement::DEBT,
-                            'amount' => $data['debt_data']['amount'],
-                            'amount_cashes' => $cashes->total
-                        ]);
-                    }
                     $cashes->update();
                 }
+            }
 
-                CashesHistory::create([
-                    'product_movement_id' => $productMovement->id,
-                    'user_id' => $auth->id,
-                    'cashes_id' => $cashesItem['cashes_id'],
-                    'type_id' => $data['type_id'],
-                    'amount' => $cashesItem['amount'],
-                    'amount_cashes' => $cashes->total
-                ]);
+            // Борг
+            if (isset($data['debt_data'])) {
+                $debt = $data['debt_data'];
+                $cashes = Cashes::find($debt['cashes_id']);
+
+                if ($cashes) {
+                    CashesHistory::create([
+                        'product_movement_id' => $productMovement->id,
+                        'user_id' => $auth->id,
+                        'cashes_id' => $debt['cashes_id'],
+                        'type_id' => ProductMovement::DEBT,
+                        'amount' => $debt['amount'],
+                        'amount_cashes' => $cashes->total
+                    ]);
+
+                    $cashes->debt -= $debt['amount'];
+                    $cashes->update();
+                }
             }
         }
 

@@ -30,7 +30,7 @@ class ProductMovementResource extends JsonResource
             'created_at' => Carbon::parse($this->created_at)->format('d.m.Y H:i:s'),
 
             'items' => new ProductsMovementsItemsResource($this->items),
-            'cashes_history' => new CashesHistoryResource($this->cashesHistory),
+            'transactions' => new CashesHistoryResource($this->cashesHistory),
         ];
 
         return $return;

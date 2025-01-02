@@ -161,6 +161,11 @@ class CashesController extends CoreController
             $query->where('type_id', ProductMovement::DEBT);
         }
 
+        if (isset($data['time_period'])) {
+            $typeId = $data['time_period']; // 1 - за день, 2 - за тиждень, 3 - за місяць, 4 - за рік
+
+        }
+
         $query->orderBy('id', 'desc');
 
         $transactions = $query->get();
@@ -182,12 +187,12 @@ class CashesController extends CoreController
             ->where('type_id', ProductMovement::DEBT)
             ->first();
 
-        if (empty($transaction)){
+        if (empty($transaction)) {
             return $this->responseError('Борг не знайдений');
         }
 
         return $this->responseSuccess([
-           'transaction' => new CashesHistoryItemResource($transaction)
+            'transaction' => new CashesHistoryItemResource($transaction)
         ]);
     }
 
@@ -203,13 +208,22 @@ class CashesController extends CoreController
             ->where('type_id', ProductMovement::DEBT)
             ->first();
 
-        if (empty($cashesHistory)){
+        if (empty($cashesHistory)) {
             return $this->responseError('Борг не знайдений');
         }
 
         $cashes = Cashes::find($cashesHistory->cashes_id);
 
         if (isset($cashesHistory) && isset($cashes)) {
+
+            if ($cashes->total <= 0) {
+                return $this->responseError('Недостатньо коштів для списання. На рахунку: ' . $cashes->total);
+            }
+
+            if ($cashes->total <= $cashes->debt) {
+                return $this->responseError('Недостатньо коштів для списання. На рахунку: ' . $cashes->total);
+            }
+
             $cashes->debt -= $cashesHistory->amount;
             $cashes->update();
 
@@ -237,7 +251,7 @@ class CashesController extends CoreController
             ->where('type_id', ProductMovement::DEBT)
             ->first();
 
-        if (empty($cashesHistory)){
+        if (empty($cashesHistory)) {
             return $this->responseError('Борг не знайдений');
         }
 
