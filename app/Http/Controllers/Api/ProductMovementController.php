@@ -419,7 +419,7 @@ class ProductMovementController extends CoreController
 
                 if ($cashes) {
                     CashesHistory::create([
-                        'product_movement_id' => $productMovement->id,
+                        'product_movement_id' => $newProductMovement->id,
                         'user_id' => $auth->id,
                         'cashes_id' => $debt['cashes_id'],
                         'type_id' => ProductMovement::DEBT,
